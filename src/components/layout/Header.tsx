@@ -16,18 +16,18 @@ export function Header() {
     const isActive = (path: string) => location.pathname === path
 
     return (
-        <header className="md:flex md:justify-between md:items-end border-b border-b-secondary">
+        <header className="md:flex md:justify-between md:items-end border-b border-b-color">
             <div className="p-4 flex justify-between items-center">
-                <h1 className="text-3xl font-bold">Expense Tracker</h1>
+                <h2 className="text-lg font-bold">Expense Tracker</h2>
 
                 {/* Mobile menu button */}
                 <button
                     onClick={() => setIsOpen(!isOpen)}
                     className="md:hidden flex flex-col gap-1"
                     aria-label="Toggle menu">
-                    <span className="block w-6 h-0.5 bg-white"></span>
-                    <span className="block w-6 h-0.5 bg-white"></span>
-                    <span className="block w-6 h-0.5 bg-white"></span>
+                    <span className="block w-6 h-0.5 bg-foreground"></span>
+                    <span className="block w-6 h-0.5 bg-foreground"></span>
+                    <span className="block w-6 h-0.5 bg-foreground"></span>
                 </button>
             </div>
 
