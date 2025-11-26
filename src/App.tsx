@@ -6,31 +6,48 @@ import { Analytics } from '@/pages/Analytics'
 import { Settings } from '@/pages/Settings'
 import { AddTransaction } from '@/pages/AddTransaction'
 import { SettingsProvider } from '@/context/SettingsContext'
+import { TransactionProvider } from '@/context/TransactionContext'
+import { CategoriesProvider } from '@/context/CategoriesContext'
 
 function App() {
     return (
         <BrowserRouter>
-            <SettingsProvider>
-                <Layout>
-                    <Routes>
-                        <Route
-                            path="/"
-                            element={<Navigate to="/dashboard" replace />}
-                        />
-                        <Route path="/dashboard" element={<Dashboard />} />
-                        <Route
-                            path="/transactions"
-                            element={<Transactions />}
-                        />
-                        <Route path="/analytics" element={<Analytics />} />
-                        <Route path="/settings" element={<Settings />} />
-                        <Route
-                            path="/add-transaction"
-                            element={<AddTransaction />}
-                        />
-                    </Routes>
-                </Layout>
-            </SettingsProvider>
+            <CategoriesProvider>
+                <TransactionProvider>
+                    <SettingsProvider>
+                        <Layout>
+                            <Routes>
+                                <Route
+                                    path="/"
+                                    element={
+                                        <Navigate to="/dashboard" replace />
+                                    }
+                                />
+                                <Route
+                                    path="/dashboard"
+                                    element={<Dashboard />}
+                                />
+                                <Route
+                                    path="/transactions"
+                                    element={<Transactions />}
+                                />
+                                <Route
+                                    path="/analytics"
+                                    element={<Analytics />}
+                                />
+                                <Route
+                                    path="/settings"
+                                    element={<Settings />}
+                                />
+                                <Route
+                                    path="/add-transaction"
+                                    element={<AddTransaction />}
+                                />
+                            </Routes>
+                        </Layout>
+                    </SettingsProvider>
+                </TransactionProvider>
+            </CategoriesProvider>
         </BrowserRouter>
     )
 }
