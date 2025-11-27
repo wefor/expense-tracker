@@ -42,7 +42,7 @@ export function Header() {
                             <Link
                                 to={link.path}
                                 onClick={() => setIsOpen(false)}
-                                className={`block px-4 py-3 md:py-0 transition-colors ${
+                                className={`block px-4 py-3 md:py-0 text-foreground ${
                                     isActive(link.path)
                                         ? 'font-bold text-accent md:border-b-2 md:border-accent'
                                         : 'hover:text-accent'

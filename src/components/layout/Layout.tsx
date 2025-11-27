@@ -1,7 +1,21 @@
-import { type ReactNode } from 'react'
+import { type ReactNode, useContext, useState, useEffect } from 'react'
 import { Header } from './Header'
+import { SettingsContext } from '@/context/SettingsContext'
 
 export function Layout({ children }: { children: ReactNode }) {
+    const settingsContext = useContext(SettingsContext)
+
+    if (!settingsContext) {
+        throw new Error('SettingsContext not found')
+    }
+    const { settings } = settingsContext
+    const [theme, setTheme] = useState(settings.theme)
+
+    useEffect(() => {
+        setTheme(settings.theme)
+        document.documentElement.setAttribute('class', settings.theme)
+        console.log('Current theme:', theme)
+    }, [settings.theme])
     return (
         <div className="min-h-screen flex flex-col">
             <Header />
