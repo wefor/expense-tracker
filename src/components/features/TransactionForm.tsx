@@ -235,17 +235,6 @@ export function TransactionForm({
                                     <InputGroupText>USD</InputGroupText>
                                 </InputGroupAddon>
                             </InputGroup>
-                            {/* <Input
-                                name={field.name}
-                                value={field.value}
-                                aria-invalid={fieldState.invalid}
-                                id="form-amount"
-                                type="number"
-                                placeholder="0.00"
-                                onChange={(e) => {
-                                    field.onChange(Number(e.target.value))
-                                }}
-                            /> */}
                             {fieldState.invalid && (
                                 <FieldError errors={[fieldState.error]} />
                             )}
