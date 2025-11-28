@@ -16,6 +16,7 @@ type TransactionAction =
       }
     | { type: 'UPDATE_TRANSACTION'; payload: Transaction }
     | { type: 'DELETE_TRANSACTION'; payload: string }
+    | { type: 'DELETE_ALL_TRANSACTIONS' }
     | { type: 'SET_TRANSACTIONS'; payload: Transaction[] }
 
 function transactionReducer(
@@ -56,6 +57,13 @@ function transactionReducer(
             }
         }
 
+        case 'DELETE_ALL_TRANSACTIONS': {
+            return {
+                ...state,
+                transactions: [],
+            }
+        }
+
         case 'SET_TRANSACTIONS': {
             return {
                 ...state,
@@ -75,6 +83,7 @@ export interface TransactionContextValue {
     ) => void
     updateTransaction: (id: string, transaction: Partial<Transaction>) => void
     deleteTransaction: (id: string) => void
+    deleteAllTransactions: () => void
     getTransactions: (filter?: FilterOptions) => Transaction[]
 }
 
@@ -157,6 +166,14 @@ export function TransactionProvider({ children }: TransactionProviderProps) {
         [setStoredTransactions]
     )
 
+    const deleteAllTransactions = useCallback(() => {
+        dispatch({
+            type: 'DELETE_ALL_TRANSACTIONS',
+        })
+        // Re-save to localStorage
+        setStoredTransactions([])
+    }, [setStoredTransactions])
+
     const getTransactions = useCallback(
         (filter?: FilterOptions) => {
             if (!filter) return state.transactions
@@ -171,6 +188,7 @@ export function TransactionProvider({ children }: TransactionProviderProps) {
         addTransaction,
         updateTransaction,
         deleteTransaction,
+        deleteAllTransactions,
         getTransactions,
     }
 
