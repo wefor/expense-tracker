@@ -3,7 +3,7 @@ import { SettingsContext } from '@/context/SettingsContext'
 import { TransactionContext } from '@/context/TransactionContext'
 import { clsx } from 'clsx'
 import { Button } from '@/components/ui/button'
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
+import { Alert, AlertDescription } from '@/components/ui/alert'
 import { AlertCircleIcon } from 'lucide-react'
 import {
     type SelectOption,
@@ -28,7 +28,7 @@ export function Settings() {
         throw new Error('Required context not found')
     }
     const { settings, updateSettings } = settingsContext
-    const { transactions } = transactionContext
+    const { transactions, deleteAllTransactions } = transactionContext
 
     const themeOptions: SelectOption[] = [
         { label: 'Light', value: 'light' },
@@ -81,7 +81,7 @@ export function Settings() {
             )
         ) {
             try {
-                localStorage.clear()
+                deleteAllTransactions()
                 window.location.reload()
             } catch (err) {
                 setMessageType('error')
@@ -136,11 +136,12 @@ export function Settings() {
                                 className="flex grow items-center space-x-2 h-full">
                                 <Label
                                     htmlFor={`theme-${theme.value}`}
-                                    className={`flex cursor-pointer h-full grow items-center justify-center overflow-hidden rounded-lg px-2 text-primary text-sm font-medium leading-normal ${
+                                    className={clsx(
+                                        'flex cursor-pointer h-full grow items-center justify-center overflow-hidden rounded-lg px-2 text-primary text-sm font-medium leading-normal',
                                         settings.theme === theme.value
                                             ? 'bg-primary shadow-[0_0_4px_rgba(0,0,0,0.1)] text-primary-foreground'
                                             : ''
-                                    }`}>
+                                    )}>
                                     <RadioGroupItem
                                         value={theme.value}
                                         id={`theme-${theme.value}`}
