@@ -14,7 +14,6 @@ export function Layout({ children }: { children: ReactNode }) {
     useEffect(() => {
         setTheme(settings.theme)
         document.documentElement.setAttribute('class', settings.theme)
-        console.log('Current theme:', theme)
     }, [settings.theme])
     return (
         <div className="min-h-screen flex flex-col">
