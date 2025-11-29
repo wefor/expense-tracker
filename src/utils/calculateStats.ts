@@ -112,18 +112,49 @@ export function calculateMonthlyTrend(
     })
 }
 
+// Calculate percentage change
+const calculateChange = (currentAmount: number, lastAmount: number): number => {
+    if (lastAmount === 0) {
+        return currentAmount > 0 ? 100 : 0
+    }
+
+    const percentageChange = ((currentAmount - lastAmount) / lastAmount) * 100
+
+    return Math.round(percentageChange * 100) / 100
+}
+
 /**
  * Calculate statistics for a transaction list
  */
 export function calculateStatistics(
     transactions: Transaction[],
+    lastTransactions: Transaction[],
     categories: Category[]
 ): StatisticData {
+    const totalIncome = calculateTotalIncome(transactions)
+    const totalExpense = calculateTotalExpense(transactions)
+    const netAmount = calculateNetAmount(transactions)
+    const todayExpense = getTodayExpense(transactions)
+
+    const lastTotalIncome = calculateTotalIncome(lastTransactions)
+    const lastTotalExpense = calculateTotalExpense(lastTransactions)
+    const lastNetAmount = calculateNetAmount(lastTransactions)
+    const lastTodayExpense = getTodayExpense(lastTransactions)
+
+    const incomeCompare = calculateChange(totalIncome, lastTotalIncome)
+    const expenseCompare = calculateChange(totalExpense, lastTotalExpense)
+    const netAmountCompare = calculateChange(netAmount, lastNetAmount)
+    const todayExpenseCompare = calculateChange(todayExpense, lastTodayExpense)
+
     return {
-        totalIncome: calculateTotalIncome(transactions),
-        totalExpense: calculateTotalExpense(transactions),
-        netAmount: calculateNetAmount(transactions),
-        todayExpense: getTodayExpense(transactions),
+        totalIncome,
+        totalExpense,
+        netAmount,
+        todayExpense,
+        incomeCompare,
+        expenseCompare,
+        netAmountCompare,
+        todayExpenseCompare,
         categoryStats: calculateCategoryStats(transactions, categories),
         monthlyTrend: calculateMonthlyTrend(transactions),
     }
@@ -148,7 +179,7 @@ export function getCurrentMonthStats(
         )
     })
 
-    return calculateStatistics(monthTransactions, categories)
+    return calculateStatistics(monthTransactions, [], categories)
 }
 
 /**

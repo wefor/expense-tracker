@@ -20,6 +20,7 @@ export function StatCard({ label, value, compare = 0 }: StatCardProps) {
                     'text-base font-medium leading-normal',
                     compare < 0 ? 'text-destructive' : 'text-accent'
                 )}>
+                <span>{compare < 0 ? '↓' : '↑'}</span>
                 {compare}%
             </p>
         </div>

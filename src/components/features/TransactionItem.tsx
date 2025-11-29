@@ -51,7 +51,7 @@ export function TransactionItem({
                 </div>
             </div>
             <div className="shrink-0">
-                <p className="text-foreground text-base font-normal leading-normal">
+                <div className="text-foreground text-base font-normal leading-normal">
                     <div className={`text-base font-normal leading-normal`}>
                         {isIncome ? '+' : '-'}
                         {formatCurrency(transaction.amount)}
@@ -74,7 +74,7 @@ export function TransactionItem({
                             )}
                         </div>
                     )}
-                </p>
+                </div>
             </div>
         </div>
     )

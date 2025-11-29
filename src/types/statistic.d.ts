@@ -17,6 +17,10 @@ export interface StatisticData {
     totalExpense: number
     netAmount: number
     todayExpense: number
+    incomeCompare: number
+    expenseCompare: number
+    netAmountCompare: number
+    todayExpenseCompare: number
     categoryStats: CategoryStat[]
     monthlyTrend: MonthlyData[]
 }
