@@ -1,6 +1,6 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { Layout } from '@/components/layout/Layout'
-import { Dashboard } from '@/pages/Dashboard'
+import { Overview } from '@/pages/Overview'
 import { Transactions } from '@/pages/Transactions'
 import { Analytics } from '@/pages/Analytics'
 import { Settings } from '@/pages/Settings'
@@ -20,12 +20,12 @@ function App() {
                                 <Route
                                     path="/"
                                     element={
-                                        <Navigate to="/dashboard" replace />
+                                        <Navigate to="/overview" replace />
                                     }
                                 />
                                 <Route
-                                    path="/dashboard"
-                                    element={<Dashboard />}
+                                    path="/overview"
+                                    element={<Overview />}
                                 />
                                 <Route
                                     path="/transactions"

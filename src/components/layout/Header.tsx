@@ -6,7 +6,7 @@ export function Header() {
     const location = useLocation()
 
     const navLinks = [
-        { path: '/dashboard', label: 'Dashboard' },
+        { path: '/overview', label: 'Overview' },
         { path: '/transactions', label: 'Transactions' },
         { path: '/analytics', label: 'Analytics' },
         { path: '/settings', label: 'Settings' },
