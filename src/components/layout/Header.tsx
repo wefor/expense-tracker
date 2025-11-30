@@ -38,7 +38,9 @@ export function Header() {
                 } md:flex md:justify-center md:gap-6 md:pb-4 md:px-4 transition-all`}>
                 <ul className="flex flex-col md:flex-row md:gap-6 divide-y md:divide-y-0 bg-secondary md:bg-transparent">
                     {navLinks.map((link) => (
-                        <li key={link.path}>
+                        <li
+                            key={link.path}
+                            className="border-b-primary dark:border-b-green-100">
                             <Link
                                 to={link.path}
                                 onClick={() => setIsOpen(false)}
