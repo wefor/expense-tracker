@@ -9,7 +9,7 @@ import {
     endOfWeek,
 } from 'date-fns'
 
-import { zhTW } from 'date-fns/locale'
+import { enUS } from 'date-fns/locale'
 
 export function formatDateISO(date: Date | string): string {
     const parsedDate = typeof date === 'string' ? parseISO(date) : date
@@ -18,7 +18,7 @@ export function formatDateISO(date: Date | string): string {
 
 export function formatDateDisplay(date: Date | string): string {
     const parsedDate = typeof date === 'string' ? parseISO(date) : date
-    return format(parsedDate, 'yyyy年MM月dd日', { locale: zhTW })
+    return format(parsedDate, 'MMM dd, yyyy', { locale: enUS })
 }
 
 export function formatMonth(date: Date | string): string {
@@ -28,7 +28,7 @@ export function formatMonth(date: Date | string): string {
 
 export function formatMonthName(date: Date | string): string {
     const parsedDate = typeof date === 'string' ? parseISO(date) : date
-    return format(parsedDate, 'MMMM yyyy', { locale: zhTW })
+    return format(parsedDate, 'MMMM yyyy', { locale: enUS })
 }
 
 // Get month range
