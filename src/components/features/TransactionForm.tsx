@@ -1,4 +1,4 @@
-import { useState, useContext } from 'react'
+import { useState, useContext, useEffect } from 'react'
 import { CategoriesContext } from '@/context/CategoriesContext'
 import { TransactionContext } from '@/context/TransactionContext'
 import type { Transaction } from '@/types/transaction'
@@ -26,10 +26,8 @@ import {
     InputGroupAddon,
     InputGroupInput,
     InputGroupText,
-    InputGroupTextarea,
 } from '@/components/ui/input-group'
 import { Label } from '@/components/ui/label'
-import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { Calendar } from '@/components/ui/calendar'
 import {
@@ -79,6 +77,17 @@ export function TransactionForm({
             'CategoriesContext or TransactionContext not found. Please ensure that TransactionForm is used within a CategoriesProvider.'
         )
     }
+    const form = useForm<z.infer<typeof formSchema>>({
+        resolver: zodResolver(formSchema),
+        defaultValues: {
+            type: initialData ? initialData.type : 'expense',
+            category: initialData ? initialData.category : '',
+            amount: initialData ? initialData.amount : 0,
+            date: initialData ? initialData.date : formatDateISO(new Date()),
+            description: initialData ? initialData.description : '',
+        },
+    })
+
     const [open, setOpen] = useState(false)
     const typeOptions: SelectOption[] = [
         { label: 'Expense', value: 'expense' },
@@ -96,16 +105,11 @@ export function TransactionForm({
 
     const [categoriesOptions, setCategoryOptions] = useState(expenseCategories)
 
-    const form = useForm<z.infer<typeof formSchema>>({
-        resolver: zodResolver(formSchema),
-        defaultValues: {
-            type: 'expense',
-            category: '',
-            amount: 0,
-            date: formatDateISO(new Date()),
-            description: '',
-        },
-    })
+    useEffect(() => {
+        if (initialData && initialData.type === 'income') {
+            setCategoryOptions(incomeCategories)
+        }
+    }, [initialData])
 
     function handleSubmit(values: z.infer<typeof formSchema>) {
         const result: Omit<Transaction, 'id' | 'createdAt' | 'updatedAt'> = {
