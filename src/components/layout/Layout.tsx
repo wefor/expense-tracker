@@ -1,6 +1,7 @@
 import { type ReactNode, useContext, useState, useEffect } from 'react'
 import { Header } from './Header'
 import { SettingsContext } from '@/context/SettingsContext'
+import { Toaster } from '@/components/ui/sonner'
 
 export function Layout({ children }: { children: ReactNode }) {
     const settingsContext = useContext(SettingsContext)
@@ -21,6 +22,7 @@ export function Layout({ children }: { children: ReactNode }) {
             <main className="flex-grow container mx-auto max-w-[960px] px-4 py-6">
                 {children}
             </main>
+            <Toaster />
         </div>
     )
 }
