@@ -9,6 +9,11 @@ export interface Transaction {
     updatedAt: number
 }
 
+export interface GroupedTransaction {
+    date: string
+    transactions: Transaction[]
+}
+
 export interface FilterOptions {
     type?: 'income' | 'expense' | 'all'
     categories?: string[]
