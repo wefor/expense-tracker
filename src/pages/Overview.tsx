@@ -5,7 +5,6 @@ import { CategoriesContext } from '@/context/CategoriesContext'
 import { StatCard } from '@/components/features/StatCard'
 import { TransactionItem } from '@/components/features/TransactionItem'
 import { CategoryExpenditure } from '@/components/features/CategoryExpenditure'
-import { Button } from '@/components/ui/button'
 import { formatCurrency } from '@/utils/formatCurrency'
 import { calculateStatistics } from '@/utils/calculateStats'
 import { getMonthRange, formatMonth } from '@/utils/formatDate'
@@ -21,8 +20,12 @@ export function Overview() {
     const { transactions } = transactionContext
     const { categories } = categoriesContext
 
+    const today = new Date()
     // Get current month range
-    const monthRange = useMemo(() => getMonthRange(new Date()), [])
+    const monthRange = useMemo(() => getMonthRange(today), [])
+    // Get last month range
+    const lastMonth = new Date(today.getFullYear(), today.getMonth() - 1, 1)
+    const lastMonthRange = useMemo(() => getMonthRange(lastMonth), [])
 
     // Get current month stats
     const monthTransactions = useMemo(
@@ -32,10 +35,25 @@ export function Overview() {
             ),
         [transactions, monthRange]
     )
+    // Get last month stats
+    const lastMonthTransactions = useMemo(
+        () =>
+            transactions.filter(
+                (t) =>
+                    t.date >= lastMonthRange.start &&
+                    t.date <= lastMonthRange.end
+            ),
+        [transactions, lastMonthRange]
+    )
 
     const stats = useMemo(
-        () => calculateStatistics(monthTransactions, categories),
-        [monthTransactions, categories]
+        () =>
+            calculateStatistics(
+                monthTransactions,
+                lastMonthTransactions,
+                categories
+            ),
+        [monthTransactions, lastMonthTransactions, categories]
     )
 
     // Get recent transactions
@@ -63,22 +81,22 @@ export function Overview() {
                 <StatCard
                     label="This Month Expense"
                     value={formatCurrency(stats.totalExpense)}
-                    compare={12}
+                    compare={stats.incomeCompare}
                 />
                 <StatCard
                     label="This Month Income"
                     value={formatCurrency(stats.totalIncome)}
-                    compare={-12}
+                    compare={stats.expenseCompare}
                 />
                 <StatCard
                     label="Current Balance"
                     value={formatCurrency(stats.netAmount)}
-                    compare={12}
+                    compare={stats.netAmountCompare}
                 />
                 <StatCard
                     label="Today's Spending"
                     value={formatCurrency(stats.todayExpense)}
-                    compare={12}
+                    compare={stats.todayExpenseCompare}
                 />
             </div>
 
@@ -97,7 +115,9 @@ export function Overview() {
                         ))}
                     </div>
                 ) : (
-                    <p className="text-gray-500">尚無分類數據</p>
+                    <p className="text-gray-500">
+                        No classification data available.
+                    </p>
                 )}
             </div>
 
@@ -121,7 +141,7 @@ export function Overview() {
                 </div>
                 {recentTransactions.length === 0 && (
                     <p className="text-gray-500 text-center py-8">
-                        還沒有交易記錄
+                        No transaction records yet
                     </p>
                 )}
             </div>
