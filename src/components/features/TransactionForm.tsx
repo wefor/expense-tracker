@@ -1,6 +1,7 @@
 import { useState, useContext, useEffect } from 'react'
 import { CategoriesContext } from '@/context/CategoriesContext'
 import { TransactionContext } from '@/context/TransactionContext'
+import { SettingsContext } from '@/context/SettingsContext'
 import type { Transaction } from '@/types/transaction'
 import { formatDateISO } from '@/utils/formatDate'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -72,9 +73,11 @@ export function TransactionForm({
 }: TransactionFormProps) {
     const categoriesContext = useContext(CategoriesContext)
     const transactionContext = useContext(TransactionContext)
-    if (!categoriesContext || !transactionContext) {
+    const settingsContext = useContext(SettingsContext)
+
+    if (!categoriesContext || !transactionContext || !settingsContext) {
         throw new Error(
-            'CategoriesContext or TransactionContext not found. Please ensure that TransactionForm is used within a CategoriesProvider.'
+            'Context not found. Please ensure that TransactionForm is used within a Provider.'
         )
     }
     const form = useForm<z.infer<typeof formSchema>>({
@@ -87,6 +90,8 @@ export function TransactionForm({
             description: initialData ? initialData.description : '',
         },
     })
+
+    const { settings } = settingsContext
 
     const [open, setOpen] = useState(false)
     const typeOptions: SelectOption[] = [
@@ -236,7 +241,9 @@ export function TransactionForm({
                                     }}
                                 />
                                 <InputGroupAddon align="inline-end">
-                                    <InputGroupText>USD</InputGroupText>
+                                    <InputGroupText>
+                                        {settings.currency}
+                                    </InputGroupText>
                                 </InputGroupAddon>
                             </InputGroup>
                             {fieldState.invalid && (
