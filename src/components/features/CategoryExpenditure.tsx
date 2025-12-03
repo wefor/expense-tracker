@@ -1,4 +1,3 @@
-import { type ReactNode, Fragment } from 'react'
 import { formatCurrency } from '@/utils/formatCurrency'
 import type { CategoryStat } from '@/types/statistic'
 
