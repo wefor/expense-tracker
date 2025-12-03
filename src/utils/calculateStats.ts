@@ -64,6 +64,7 @@ export function calculateCategoryStats(
         const existingStat = acc.find((stat) => stat.category === category.id)
         if (existingStat) {
             existingStat.amount += transaction.amount
+            existingStat.count += 1
         } else {
             acc.push({
                 category: transaction.category,
@@ -71,6 +72,7 @@ export function calculateCategoryStats(
                 icon: category.icon,
                 amount: transaction.amount,
                 percentage: 0, // to be calculated later
+                count: 1,
             })
         }
 
@@ -90,7 +92,7 @@ export function calculateCategoryStats(
 }
 
 /**
- * Calculate monthly trend data
+ * Calculate monthly spending trend data
  */
 export function calculateMonthlyTrend(
     transactions: Transaction[],

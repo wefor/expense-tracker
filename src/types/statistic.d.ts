@@ -4,6 +4,7 @@ export interface CategoryStat {
     name: string
     amount: number
     percentage: number
+    count: number
 }
 
 export interface MonthlyData {
