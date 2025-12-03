@@ -53,7 +53,7 @@ export function StatTabContent({ range }: StatTabContentProps) {
 
     // Get last month or year range
     const lastLastMonth = new Date(date.getFullYear(), date.getMonth() - 1, 1)
-    const lastLastYear = new Date(date.getFullYear(), 0, 1)
+    const lastLastYear = new Date(date.getFullYear() - 1, 0, 1)
     const lastLastDate =
         range === 'month' || range === 'last-month'
             ? lastLastMonth
