@@ -43,14 +43,8 @@ export function Transactions() {
     const [currentPage, setCurrentPage] = useState<number>(1)
     const [totalPages, setTotalPages] = useState<number>(0)
 
-    useEffect(() => {
-        const totalItems = transactions.length
-        setTotalPages(Math.ceil(totalItems / LIMIT))
-    }, [transactions])
-
     // Filter transactions by search term
     const filteredTransactions = useMemo(() => {
-        setCurrentPage(1)
         if (!searchTerm) return transactions
         const term = searchTerm.toLowerCase()
         return transactions.filter((t) =>
@@ -66,23 +60,30 @@ export function Transactions() {
             ),
         [filteredTransactions]
     )
-  
 
     const paginatedTransactions = useMemo(() => {
         const startIndex = (currentPage - 1) * LIMIT
         const endIndex = startIndex + LIMIT
-        setTotalPages(Math.ceil(sortedTransactions.length / LIMIT))
 
         return sortedTransactions.slice(startIndex, endIndex)
     }, [sortedTransactions, currentPage])
 
     const groupedTransactions = useMemo(() => {
-        return Object.values(groupBy(paginatedTransactions, (tx) => tx.date))
-            .map((transactions) => ({
-                date: transactions[0].date,
-                transactions: transactions,
-            }))
+        return Object.values(
+            groupBy(paginatedTransactions, (tx) => tx.date)
+        ).map((transactions) => ({
+            date: transactions[0].date,
+            transactions: transactions,
+        }))
     }, [paginatedTransactions])
+
+    useEffect(() => {
+        setCurrentPage(1)
+    }, [transactions, searchTerm])
+
+    useEffect(() => {
+        setTotalPages(Math.ceil(sortedTransactions.length / LIMIT))
+    }, [sortedTransactions])
 
     const handlePageChange = (page: number) => {
         setCurrentPage(page)
