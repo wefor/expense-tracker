@@ -16,7 +16,7 @@ export function Header() {
     const isActive = (path: string) => location.pathname === path
 
     return (
-        <header className="md:flex md:justify-between md:items-end border-b border-b-color">
+        <header className="md:flex md:justify-between md:items-end border-b">
             <div className="p-4 flex justify-between items-center">
                 <h2 className="text-lg font-bold">Expense Tracker</h2>
 
