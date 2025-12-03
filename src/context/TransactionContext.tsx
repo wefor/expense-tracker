@@ -12,7 +12,7 @@ interface TransactionState {
 type TransactionAction =
     | {
           type: 'ADD_TRANSACTION'
-          payload: Omit<Transaction, 'id' | 'createdAt' | 'updatedAt'>
+          payload: Omit<Transaction, 'createdAt' | 'updatedAt'>
       }
     | { type: 'UPDATE_TRANSACTION'; payload: Transaction }
     | { type: 'DELETE_TRANSACTION'; payload: string }
@@ -27,7 +27,7 @@ function transactionReducer(
         case 'ADD_TRANSACTION': {
             const newTransaction: Transaction = {
                 ...action.payload,
-                id: generateId(),
+                // id: generateId(),
                 createdAt: Date.now(),
                 updatedAt: Date.now(),
             }
@@ -106,22 +106,20 @@ export function TransactionProvider({ children }: TransactionProviderProps) {
         transactions: storedTransactions,
     })
 
-    // Sync to localStorage whenever transactions change
-    useLocalStorage(STORAGE_KEY, state.transactions)
-
     const transactionHooks = useTransactions(state.transactions)
 
     const addTransaction = useCallback(
         (transaction: Omit<Transaction, 'id' | 'createdAt' | 'updatedAt'>) => {
+            const uuid = generateId()
             dispatch({
                 type: 'ADD_TRANSACTION',
-                payload: transaction,
+                payload: { ...transaction, id: uuid },
             })
             // Re-save to localStorage
             setStoredTransactions((prev) => {
                 const newTransaction: Transaction = {
                     ...transaction,
-                    id: generateId(),
+                    id: uuid,
                     createdAt: Date.now(),
                     updatedAt: Date.now(),
                 }
