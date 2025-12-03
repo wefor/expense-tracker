@@ -111,8 +111,10 @@ export function TransactionForm({
     const [categoriesOptions, setCategoryOptions] = useState(expenseCategories)
 
     useEffect(() => {
-        if (initialData && initialData.type === 'income') {
-            setCategoryOptions(incomeCategories)
+        if (initialData) {
+            if (initialData.type === 'income')
+                setCategoryOptions(incomeCategories)
+            else setCategoryOptions(expenseCategories)
         }
     }, [initialData])
 
