@@ -131,23 +131,25 @@ export function TransactionProvider({ children }: TransactionProviderProps) {
 
     const updateTransaction = useCallback(
         (id: string, updates: Partial<Transaction>) => {
-            dispatch({
-                type: 'UPDATE_TRANSACTION',
-                payload: {
-                    ...state.transactions.find((t) => t.id === id),
-                    ...updates,
-                    id,
-                    updatedAt: Date.now(),
-                } as Transaction,
-            })
-            // Re-save to localStorage
-            setStoredTransactions((prev) =>
-                prev.map((t) =>
-                    t.id === id
-                        ? { ...t, ...updates, updatedAt: Date.now() }
-                        : t
+            if (state.transactions.find((t) => t.id === id)) {
+                dispatch({
+                    type: 'UPDATE_TRANSACTION',
+                    payload: {
+                        ...state.transactions.find((t) => t.id === id),
+                        ...updates,
+                        id,
+                        updatedAt: Date.now(),
+                    } as Transaction,
+                })
+                // Re-save to localStorage
+                setStoredTransactions((prev) =>
+                    prev.map((t) =>
+                        t.id === id
+                            ? { ...t, ...updates, updatedAt: Date.now() }
+                            : t
+                    )
                 )
-            )
+            }
         },
         [state.transactions, setStoredTransactions]
     )
