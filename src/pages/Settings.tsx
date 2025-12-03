@@ -127,7 +127,7 @@ export function Settings() {
                 </div>
                 <div className="flex md:px-2 py-3">
                     <RadioGroup
-                        defaultValue="system"
+                        defaultValue="{settings.theme}"
                         onValueChange={handleUpdateTheme}
                         className="flex h-10 flex-1 items-center justify-around rounded-lg bg-secondary p-1">
                         {themeOptions.map((theme) => (
