@@ -81,12 +81,12 @@ export function Overview() {
                 <StatCard
                     label="This Month Expense"
                     value={formatCurrency(stats.totalExpense)}
-                    compare={stats.incomeCompare}
+                    compare={stats.expenseCompare}
                 />
                 <StatCard
                     label="This Month Income"
                     value={formatCurrency(stats.totalIncome)}
-                    compare={stats.expenseCompare}
+                    compare={stats.incomeCompare}
                 />
                 <StatCard
                     label="Current Balance"
