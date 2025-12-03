@@ -140,7 +140,7 @@ export function Overview() {
                     ))}
                 </div>
                 {recentTransactions.length === 0 && (
-                    <p className="text-gray-500 text-center py-8">
+                    <p className="text-gray-500 text-left py-8">
                         No transaction records yet
                     </p>
                 )}
