@@ -1,10 +1,9 @@
 import { useContext, useState, useEffect, useMemo } from 'react'
-import { useNavigate } from 'react-router-dom'
 import { TransactionContext } from '@/context/TransactionContext'
 import { TransactionList } from '@/components/features/TransactionList'
 import { TransactionForm } from '@/components/features/TransactionForm'
+import { Filters } from '@/components/features/Filters'
 import { Button } from '@/components/ui/button'
-import { XIcon, Plus } from 'lucide-react'
 import { toast } from 'sonner'
 import {
     Dialog,
@@ -14,15 +13,8 @@ import {
     DialogHeader,
     DialogTitle,
 } from '@/components/ui/dialog'
-import {
-    InputGroup,
-    InputGroupAddon,
-    InputGroupInput,
-    InputGroupText,
-} from '@/components/ui/input-group'
 import { PaginationWithSelect } from '@/components/ui/pagination'
-import MagnifyingGlass from '@/components/common/icons/MagnifyingGlass'
-import type { Transaction, GroupedTransaction } from '@/types/transaction'
+import type { Transaction } from '@/types/transaction'
 import { groupBy } from '@/utils/utility'
 
 export function Transactions() {
@@ -33,11 +25,14 @@ export function Transactions() {
         throw new Error('TransactionContext not found')
     }
 
-    const { transactions, updateTransaction, deleteTransaction } =
-        transactionContext
+    const {
+        transactions,
+        filters,
+        updateTransaction,
+        deleteTransaction,
+        getTransactions,
+    } = transactionContext
 
-    const navigate = useNavigate()
-    const [searchTerm, setSearchTerm] = useState('')
     const [editingId, setEditingId] = useState<string | null>(null)
     const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null)
     const [currentPage, setCurrentPage] = useState<number>(1)
@@ -45,12 +40,9 @@ export function Transactions() {
 
     // Filter transactions by search term
     const filteredTransactions = useMemo(() => {
-        if (!searchTerm) return transactions
-        const term = searchTerm.toLowerCase()
-        return transactions.filter((t) =>
-            t.description.toLowerCase().includes(term)
-        )
-    }, [transactions, searchTerm])
+        if (!filters) return transactions
+        return getTransactions(filters)
+    }, [transactions, filters])
 
     // Sort by date (newest first)
     const sortedTransactions = useMemo(
@@ -73,13 +65,13 @@ export function Transactions() {
             groupBy(paginatedTransactions, (tx) => tx.date)
         ).map((transactions) => ({
             date: transactions[0].date,
-            transactions: transactions,
+            transactions,
         }))
     }, [paginatedTransactions])
 
     useEffect(() => {
         setCurrentPage(1)
-    }, [transactions, searchTerm])
+    }, [transactions, filters])
 
     useEffect(() => {
         setTotalPages(Math.ceil(sortedTransactions.length / LIMIT))
@@ -123,32 +115,9 @@ export function Transactions() {
                     View and manage all your transactions in one place.
                 </p>
             </div>
-            <div className="flex gap-4 py-3">
-                <InputGroup>
-                    <InputGroupAddon>
-                        <InputGroupText>
-                            <MagnifyingGlass />
-                        </InputGroupText>
-                    </InputGroupAddon>
-                    <InputGroupInput
-                        placeholder="Search by description..."
-                        value={searchTerm}
-                        id="form-amount"
-                        onChange={(e) => setSearchTerm(e.target.value)}
-                    />
-                    <InputGroupAddon align="inline-end">
-                        <XIcon
-                            className="cursor-pointer hover:bg-accent/20 rounded-full"
-                            onClick={() => setSearchTerm('')}
-                        />
-                    </InputGroupAddon>
-                </InputGroup>
-                <Button
-                    size="icon"
-                    onClick={() => navigate('/add-transaction')}>
-                    <Plus />
-                </Button>
-            </div>
+
+            <Filters />
+
             <div>
                 <p className="text-sm text-muted-foreground mb-4">
                     Showing {sortedTransactions.length} transactions

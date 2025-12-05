@@ -7,6 +7,7 @@ import { generateId } from '../utils/validation'
 
 interface TransactionState {
     transactions: Transaction[]
+    filters: FilterOptions
 }
 
 type TransactionAction =
@@ -18,6 +19,7 @@ type TransactionAction =
     | { type: 'DELETE_TRANSACTION'; payload: string }
     | { type: 'DELETE_ALL_TRANSACTIONS' }
     | { type: 'SET_TRANSACTIONS'; payload: Transaction[] }
+    | { type: 'SET_TRANSACTION_FILTERS'; payload: FilterOptions }
 
 function transactionReducer(
     state: TransactionState,
@@ -71,6 +73,13 @@ function transactionReducer(
             }
         }
 
+        case 'SET_TRANSACTION_FILTERS': {
+            return {
+                ...state,
+                filters: action.payload,
+            }
+        }
+
         default:
             return state
     }
@@ -78,6 +87,7 @@ function transactionReducer(
 
 export interface TransactionContextValue {
     transactions: Transaction[]
+    filters: FilterOptions
     addTransaction: (
         transaction: Omit<Transaction, 'id' | 'createdAt' | 'updatedAt'>
     ) => void
@@ -85,6 +95,7 @@ export interface TransactionContextValue {
     deleteTransaction: (id: string) => void
     deleteAllTransactions: () => void
     getTransactions: (filter?: FilterOptions) => Transaction[]
+    setFilters: (filter: FilterOptions) => void
 }
 
 export const TransactionContext = createContext<
@@ -104,6 +115,10 @@ export function TransactionProvider({ children }: TransactionProviderProps) {
 
     const [state, dispatch] = useReducer(transactionReducer, {
         transactions: storedTransactions,
+        filters: {
+            type: 'all',
+            searchTerm: '',
+        },
     })
 
     const transactionHooks = useTransactions(state.transactions)
@@ -174,6 +189,19 @@ export function TransactionProvider({ children }: TransactionProviderProps) {
         setStoredTransactions([])
     }, [setStoredTransactions])
 
+    const setFilters = useCallback(
+        (updates: Partial<FilterOptions>) => {
+            dispatch({
+                type: 'SET_TRANSACTION_FILTERS',
+                payload: {
+                    ...state.filters,
+                    ...updates,
+                },
+            })
+        },
+        [state.filters]
+    )
+
     const getTransactions = useCallback(
         (filter?: FilterOptions) => {
             if (!filter) return state.transactions
@@ -185,10 +213,12 @@ export function TransactionProvider({ children }: TransactionProviderProps) {
 
     const value: TransactionContextValue = {
         transactions: state.transactions,
+        filters: state.filters,
         addTransaction,
         updateTransaction,
         deleteTransaction,
         deleteAllTransactions,
+        setFilters,
         getTransactions,
     }
 
