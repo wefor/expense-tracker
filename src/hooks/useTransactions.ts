@@ -62,7 +62,6 @@ export function useTransactions(transactions: Transaction[]) {
     const filterTransactions = useCallback(
         (filters: FilterOptions): Transaction[] => {
             let result = [...transactions]
-
             // Filter by date range
             if (filters.dateRange?.start && filters.dateRange?.end) {
                 result = result.filter((t) =>
@@ -82,7 +81,7 @@ export function useTransactions(transactions: Transaction[]) {
             }
 
             // Filter by amount range
-            if (filters.amountRange) {
+            if (filters.amountRange && filters.amountRange.max > 0) {
                 result = result.filter((t) =>
                     isWithinAmountRange(
                         t.amount,
