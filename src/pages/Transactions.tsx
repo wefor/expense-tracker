@@ -1,4 +1,5 @@
 import { useContext, useState, useEffect, useMemo } from 'react'
+import { useTranslation } from 'react-i18next'
 import { TransactionContext } from '@/context/TransactionContext'
 import { TransactionList } from '@/components/features/TransactionList'
 import { TransactionForm } from '@/components/features/TransactionForm'
@@ -18,6 +19,7 @@ import type { Transaction } from '@/types/transaction'
 import { groupBy } from '@/utils/utility'
 
 export function Transactions() {
+    const { t } = useTranslation()
     const LIMIT = 5
     const transactionContext = useContext(TransactionContext)
 
@@ -91,7 +93,7 @@ export function Transactions() {
         try {
             updateTransaction(editingId!, transaction)
             setEditingId(null)
-            toast.success('The transaction has been updated.')
+            toast.success(t('addTransaction.transactionUpdated'))
         } catch (err) {
             toast.error(err instanceof Error ? err.message : 'Update failed')
         }
@@ -102,7 +104,7 @@ export function Transactions() {
         try {
             deleteTransaction(deleteConfirm)
             setDeleteConfirm(null)
-            toast.success('The transaction has been deleted.')
+            toast.success(t('transactions.transactionDeleted'))
         } catch (err) {
             toast.error(err instanceof Error ? err.message : 'Deletion failed')
         }
@@ -110,17 +112,14 @@ export function Transactions() {
     return (
         <div className="p-4">
             <div>
-                <h1 className="text-3xl font-bold mb-4">Transactions</h1>
-                <p className="text-muted-foreground">
-                    View and manage all your transactions in one place.
-                </p>
+                <h1 className="text-3xl font-bold mb-4">{t('transactions.title')}</h1>
             </div>
 
             <Filters />
 
             <div>
                 <p className="text-sm text-muted-foreground mb-4">
-                    Showing {sortedTransactions.length} transactions
+                    {t('transactions.showingTransactions', { count: sortedTransactions.length })}
                 </p>
                 <TransactionList
                     transactions={Object.values(groupedTransactions)}
@@ -142,7 +141,7 @@ export function Transactions() {
             <Dialog open={!!editingId} onOpenChange={() => setEditingId(null)}>
                 <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
                     <DialogHeader>
-                        <DialogTitle>Edit transaction</DialogTitle>
+                        <DialogTitle>{t('addTransaction.editTitle')}</DialogTitle>
                         <DialogDescription></DialogDescription>
                     </DialogHeader>
                     {editingTransaction && (
@@ -160,10 +159,9 @@ export function Transactions() {
                 onOpenChange={() => setDeleteConfirm(null)}>
                 <DialogContent>
                     <DialogHeader>
-                        <DialogTitle>Delete transaction</DialogTitle>
+                        <DialogTitle>{t('common.delete')} {t('transactions.title')}</DialogTitle>
                         <DialogDescription>
-                            Are you sure you want to delete this transaction?
-                            This action cannot be undone.
+                            {t('transactions.deleteConfirm')}
                         </DialogDescription>
                     </DialogHeader>
                     <DialogFooter>
@@ -171,12 +169,12 @@ export function Transactions() {
                             <Button
                                 variant="outline"
                                 onClick={() => setDeleteConfirm(null)}>
-                                Cancel
+                                {t('common.cancel')}
                             </Button>
                             <Button
                                 variant="destructive"
                                 onClick={handleDelete}>
-                                Delete
+                                {t('common.delete')}
                             </Button>
                         </div>
                     </DialogFooter>

@@ -1,4 +1,5 @@
 import { useState, useContext, useEffect } from 'react'
+import { useTranslation } from 'react-i18next'
 import { CategoriesContext } from '@/context/CategoriesContext'
 import { TransactionContext } from '@/context/TransactionContext'
 import { SettingsContext } from '@/context/SettingsContext'
@@ -57,20 +58,21 @@ export interface TransactionFormProps {
     error?: string
 }
 
-const formSchema = z.object({
-    type: z.enum(['income', 'expense']),
-    amount: z.number().min(1, '請輸入金額'),
-    category: z.string().min(2, '請選擇分類'),
-    date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, '請選擇日期'),
-    description: z.string('備註必須為文字'),
-})
+const createFormSchema = (t: (key: string) => string) =>
+    z.object({
+        type: z.enum(['income', 'expense']),
+        amount: z.number().min(1, t('addTransaction.amountRequired')),
+        category: z.string().min(2, t('addTransaction.categoryRequired')),
+        date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, t('addTransaction.dateRequired')),
+        description: z.string(t('addTransaction.description')),
+    })
 
 export function TransactionForm({
     onSubmit,
     initialData,
     isLoading = false,
-    error,
 }: TransactionFormProps) {
+    const { t } = useTranslation()
     const categoriesContext = useContext(CategoriesContext)
     const transactionContext = useContext(TransactionContext)
     const settingsContext = useContext(SettingsContext)
@@ -80,6 +82,7 @@ export function TransactionForm({
             'Context not found. Please ensure that TransactionForm is used within a Provider.'
         )
     }
+    const formSchema = createFormSchema(t)
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
         defaultValues: {
@@ -95,8 +98,8 @@ export function TransactionForm({
 
     const [open, setOpen] = useState(false)
     const typeOptions: SelectOption[] = [
-        { label: 'Expense', value: 'expense' },
-        { label: 'Income', value: 'income' },
+        { label: t('addTransaction.expense'), value: 'expense' },
+        { label: t('addTransaction.income'), value: 'income' },
     ]
     const expenseCategories = categoriesContext
         .getCategoriesByType('expense')
@@ -135,7 +138,7 @@ export function TransactionForm({
                     name="type"
                     render={({ field }) => (
                         <FormItem>
-                            <FormLabel>Transaction Type</FormLabel>
+                            <FormLabel>{t('addTransaction.transactionType')}</FormLabel>
                             <FormControl>
                                 <RadioGroup
                                     name={field.name}
@@ -188,7 +191,7 @@ export function TransactionForm({
                     render={({ field, fieldState }) => (
                         <Field data-invalid={fieldState.invalid}>
                             <FieldLabel htmlFor="form-category">
-                                Category
+                                {t('addTransaction.category')}
                             </FieldLabel>
                             <Select
                                 name={field.name}
@@ -198,7 +201,7 @@ export function TransactionForm({
                                 <SelectTrigger
                                     id="form-category"
                                     aria-invalid={fieldState.invalid}>
-                                    <SelectValue placeholder="Select Category" />
+                                    <SelectValue placeholder={t('addTransaction.selectCategory')} />
                                 </SelectTrigger>
                                 <SelectContent>
                                     {categoriesOptions.map((category) => (
@@ -211,7 +214,7 @@ export function TransactionForm({
                                 </SelectContent>
                             </Select>
                             <FieldDescription>
-                                Choose how often you want to be billed.
+                                {t('addTransaction.categoryDescription')}
                             </FieldDescription>
                             {fieldState.invalid && (
                                 <FieldError errors={[fieldState.error]} />
@@ -226,14 +229,14 @@ export function TransactionForm({
                     render={({ field, fieldState }) => (
                         <Field data-invalid={fieldState.invalid}>
                             <FieldLabel htmlFor="form-amount">
-                                Amount
+                                {t('addTransaction.amount')}
                             </FieldLabel>
                             <InputGroup>
                                 <InputGroupAddon>
                                     <InputGroupText>$</InputGroupText>
                                 </InputGroupAddon>
                                 <InputGroupInput
-                                    placeholder="0.00"
+                                    placeholder={t('addTransaction.amountPlaceholder')}
                                     name={field.name}
                                     value={field.value}
                                     aria-invalid={fieldState.invalid}
@@ -260,7 +263,7 @@ export function TransactionForm({
                     control={form.control}
                     render={({ field, fieldState }) => (
                         <Field data-invalid={fieldState.invalid}>
-                            <FieldLabel htmlFor="form-date">Date</FieldLabel>
+                            <FieldLabel htmlFor="form-date">{t('addTransaction.date')}</FieldLabel>
                             <Popover open={open} onOpenChange={setOpen}>
                                 <PopoverTrigger asChild>
                                     <Button
@@ -274,7 +277,7 @@ export function TransactionForm({
                                         )}>
                                         {field.value
                                             ? field.value
-                                            : 'Select Date'}
+                                            : t('addTransaction.selectDate')}
                                         <ChevronDownIcon className="size-4 opacity-50 dark:text-foreground" />
                                     </Button>
                                 </PopoverTrigger>
@@ -309,7 +312,7 @@ export function TransactionForm({
                     render={({ field, fieldState }) => (
                         <Field data-invalid={fieldState.invalid}>
                             <FieldLabel htmlFor="form-description">
-                                Description
+                                {t('addTransaction.description')}
                             </FieldLabel>
                             <Textarea
                                 name={field.name}
@@ -331,10 +334,10 @@ export function TransactionForm({
                         variant="outline"
                         className="hover:bg-secondary hover:text-foreground"
                         onClick={() => form.reset()}>
-                        Reset
+                        {t('addTransaction.reset')}
                     </Button>
                     <Button type="submit" disabled={isLoading}>
-                        Submit
+                        {t('addTransaction.submit')}
                     </Button>
                 </div>
             </form>

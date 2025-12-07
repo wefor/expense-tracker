@@ -1,7 +1,9 @@
 import { useContext, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { SettingsContext } from '@/context/SettingsContext'
 import { TransactionContext } from '@/context/TransactionContext'
 import { CategoriesContext } from '@/context/CategoriesContext'
+import { LanguageContext } from '@/context/LanguageContext'
 import { clsx } from 'clsx'
 import { Button } from '@/components/ui/button'
 import { Alert, AlertDescription } from '@/components/ui/alert'
@@ -16,7 +18,13 @@ import {
 } from '@/components/ui/select'
 import { Label } from '@/components/ui/label'
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog'
+import {
+    Dialog,
+    DialogContent,
+    DialogHeader,
+    DialogTitle,
+    DialogDescription,
+} from '@/components/ui/dialog'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { CategoryCard } from '@/components/features/CategoryCard'
 import { CategoryForm } from '@/components/features/CategoryForm'
@@ -25,17 +33,26 @@ import type { Category } from '@/types/category'
 import { toast } from 'sonner'
 
 export function Settings() {
+    const { t } = useTranslation()
     const settingsContext = useContext(SettingsContext)
     const transactionContext = useContext(TransactionContext)
     const categoriesContext = useContext(CategoriesContext)
+    const languageContext = useContext(LanguageContext)
     const [message, setMessage] = useState('')
     const [messageType, setMessageType] = useState<'success' | 'error'>(
         'success'
     )
     const [dialogOpen, setDialogOpen] = useState(false)
-    const [editingCategory, setEditingCategory] = useState<Category | null>(null)
+    const [editingCategory, setEditingCategory] = useState<Category | null>(
+        null
+    )
 
-    if (!settingsContext || !transactionContext || !categoriesContext) {
+    if (
+        !settingsContext ||
+        !transactionContext ||
+        !categoriesContext ||
+        !languageContext
+    ) {
         throw new Error('Required context not found')
     }
     const { settings, updateSettings } = settingsContext
@@ -48,14 +65,15 @@ export function Settings() {
         deleteCategory,
         resetToDefault,
     } = categoriesContext
+    const { language, changeLanguage } = languageContext
 
     const expenseCategories = getCategoriesByType('expense')
     const incomeCategories = getCategoriesByType('income')
 
     const themeOptions: SelectOption[] = [
-        { label: 'Light', value: 'light' },
-        { label: 'Dark', value: 'dark' },
-        { label: 'System', value: 'system' },
+        { label: t('settings.light'), value: 'light' },
+        { label: t('settings.dark'), value: 'dark' },
+        { label: t('settings.system'), value: 'system' },
     ]
 
     const currencyOptions: SelectOption[] = [
@@ -65,12 +83,21 @@ export function Settings() {
         { label: 'JPY', value: 'JPY' },
     ]
 
+    const languageOptions: SelectOption[] = [
+        { label: 'English', value: 'en' },
+        { label: '繁體中文', value: 'zh-TW' },
+    ]
+
     const handleUpdateTheme = (val: 'light' | 'dark' | 'system') => {
         updateSettings({ ...settings, theme: val })
     }
 
     const handleUpdateCurrency = (val: string) => {
         updateSettings({ ...settings, currency: val })
+    }
+
+    const handleUpdateLanguage = (val: string) => {
+        changeLanguage(val as 'en' | 'zh-TW')
     }
 
     const handleExportData = () => {
@@ -88,27 +115,27 @@ export function Settings() {
             link.click()
             URL.revokeObjectURL(url)
             setMessageType('success')
-            setMessage('Data has been exported')
+            setMessage(t('settings.dataExported'))
             setTimeout(() => setMessage(''), 3000)
         } catch (err) {
             setMessageType('error')
-            setMessage(err instanceof Error ? err.message : 'Outbound failed')
+            setMessage(
+                err instanceof Error ? err.message : t('settings.exportFailed')
+            )
         }
     }
 
     const handleClearData = () => {
-        if (
-            window.confirm(
-                'Are you sure you want to clear all data? This operation cannot be undone!'
-            )
-        ) {
+        if (window.confirm(t('settings.clearDataConfirm'))) {
             try {
                 deleteAllTransactions()
                 window.location.reload()
             } catch (err) {
                 setMessageType('error')
                 setMessage(
-                    err instanceof Error ? err.message : 'Cleanup failed'
+                    err instanceof Error
+                        ? err.message
+                        : t('settings.cleanupFailed')
                 )
             }
         }
@@ -128,28 +155,30 @@ export function Settings() {
         const category = categories.find((c) => c.id === id)
         if (!category) return
 
-        if (window.confirm(`Are you sure you want to delete "${category.name}" category?`)) {
+        if (
+            window.confirm(t('settings.deleteConfirm', { name: category.name }))
+        ) {
             deleteCategory(id)
-            toast.success('Category deleted')
+            toast.success(t('settings.categoryDeleted'))
         }
     }
 
     const handleSubmitCategory = (data: Omit<Category, 'id'>) => {
         if (editingCategory) {
             updateCategory(editingCategory.id, data)
-            toast.success('Category updated')
+            toast.success(t('settings.categoryUpdated'))
         } else {
             addCategory(data)
-            toast.success('Category added')
+            toast.success(t('settings.categoryAdded'))
         }
         setDialogOpen(false)
         setEditingCategory(null)
     }
 
     const handleResetCategories = () => {
-        if (window.confirm('Are you sure you want to reset all categories to default? This will delete all custom categories.')) {
+        if (window.confirm(t('settings.resetConfirm'))) {
             resetToDefault()
-            toast.success('Categories reset to default')
+            toast.success(t('settings.categoriesReset'))
         }
     }
 
@@ -159,7 +188,7 @@ export function Settings() {
 
     return (
         <div className="p-4">
-            <h1 className="text-3xl font-bold mb-4">Settings</h1>
+            <h1 className="text-3xl font-bold mb-4">{t('settings.title')}</h1>
             {message && (
                 <Alert
                     variant={
@@ -173,15 +202,15 @@ export function Settings() {
             )}
             <div className="card p-2 md-p4 ">
                 <h2 className="text-xl font-bold text-foreground pb-3 pt-5">
-                    Appearance
+                    {t('settings.appearance')}
                 </h2>
                 <div className="flex items-center gap-4  md:px-4 min-h-[72px] py-2 justify-between">
                     <div className="flex flex-col justify-center">
                         <p className="text-foreground text-base font-medium leading-normal line-clamp-1">
-                            Theme
+                            {t('settings.theme')}
                         </p>
                         <p className="text-muted-foreground text-sm font-normal leading-normal line-clamp-2">
-                            Choose between a light or dark theme for the app.
+                            {t('settings.themeDescription')}
                         </p>
                     </div>
                     <div className="shrink-0">
@@ -223,15 +252,15 @@ export function Settings() {
             </div>
             <div className="card p-2 md-p4 ">
                 <h2 className="text-xl font-bold text-foreground pb-3 pt-5">
-                    General
+                    {t('settings.general')}
                 </h2>
                 <div className="flex items-center gap-4  md:px-4 min-h-[72px] py-2 justify-between">
                     <div className="flex flex-col justify-center">
                         <p className="text-foreground text-base font-medium leading-normal line-clamp-1">
-                            Default Currency
+                            {t('settings.defaultCurrency')}
                         </p>
                         <p className="text-muted-foreground text-sm font-normal leading-normal line-clamp-2">
-                            Set the default currency for all transactions.
+                            {t('settings.currencyDescription')}
                         </p>
                     </div>
                     <div className="shrink-0">
@@ -246,12 +275,61 @@ export function Settings() {
                             value={settings.currency}
                             onValueChange={handleUpdateCurrency}>
                             <SelectTrigger className="w-[180px]">
-                                <SelectValue placeholder="Select Currency">
+                                <SelectValue
+                                    placeholder={t('settings.selectCurrency')}>
                                     {settings.currency}
                                 </SelectValue>
                             </SelectTrigger>
                             <SelectContent>
                                 {currencyOptions.map((option) => (
+                                    <SelectItem
+                                        key={option.value}
+                                        value={option.value}>
+                                        {option.label}
+                                    </SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
+                    </label>
+                </div>
+                <div className="flex items-center gap-4  md:px-4 min-h-[72px] py-2 justify-between">
+                    <div className="flex flex-col justify-center">
+                        <p className="text-foreground text-base font-medium leading-normal line-clamp-1">
+                            {t('settings.language')}
+                        </p>
+                        <p className="text-muted-foreground text-sm font-normal leading-normal line-clamp-2">
+                            {t('settings.languageDescription')}
+                        </p>
+                    </div>
+                    <div className="shrink-0">
+                        <div className="flex min-w-[84px] items-center justify-center overflow-hidden rounded-lg h-8 px-4 text-muted-foreground text-sm font-medium leading-normal w-fit">
+                            <span>
+                                {
+                                    languageOptions.find(
+                                        (opt) => opt.value === language
+                                    )?.label
+                                }
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                <div className="flex max-w-[480px] flex-wrap items-end gap-4 md:px-2 py-3">
+                    <label className="flex flex-col min-w-40 flex-1">
+                        <Select
+                            value={language}
+                            onValueChange={handleUpdateLanguage}>
+                            <SelectTrigger className="w-[180px]">
+                                <SelectValue
+                                    placeholder={t('settings.selectLanguage')}>
+                                    {
+                                        languageOptions.find(
+                                            (opt) => opt.value === language
+                                        )?.label
+                                    }
+                                </SelectValue>
+                            </SelectTrigger>
+                            <SelectContent>
+                                {languageOptions.map((option) => (
                                     <SelectItem
                                         key={option.value}
                                         value={option.value}>
@@ -269,31 +347,38 @@ export function Settings() {
                 <div className="flex items-center justify-between pb-3 pt-5">
                     <div>
                         <h2 className="text-xl font-bold text-foreground">
-                            Categories
+                            {t('settings.categories')}
                         </h2>
                         <p className="text-muted-foreground text-sm mt-1">
-                            Manage your income and expense categories
+                            {t('settings.categoriesDescription')}
                         </p>
                     </div>
                     <div className="flex gap-2">
-                        <Button variant="outline" size="sm" onClick={handleResetCategories}>
+                        <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={handleResetCategories}>
                             <RotateCcw className="mr-2 h-4 w-4" />
-                            Reset to Default
+                            {t('settings.resetToDefault')}
                         </Button>
                         <Button size="sm" onClick={handleAddCategory}>
                             <Plus className="mr-2 h-4 w-4" />
-                            Add Category
+                            {t('settings.addCategory')}
                         </Button>
                     </div>
                 </div>
 
                 <Tabs defaultValue="expense" className="w-full mt-4">
-                    <TabsList className="grid w-full max-w-md grid-cols-2">
-                        <TabsTrigger value="expense">
-                            Expense ({expenseCategories.length})
+                    <TabsList className="grid w-full max-w-md grid-cols-2 bg-background rounded-none border-b p-0 md:gap-6">
+                        <TabsTrigger
+                            value="expense"
+                            className="bg-background data-[state=active]:border-primary dark:data-[state=active]:border-primary h-full rounded-none border-0 border-b-2 border-transparent data-[state=active]:shadow-none">
+                            {t('settings.expense')} ({expenseCategories.length})
                         </TabsTrigger>
-                        <TabsTrigger value="income">
-                            Income ({incomeCategories.length})
+                        <TabsTrigger
+                            value="income"
+                            className="bg-background data-[state=active]:border-primary dark:data-[state=active]:border-primary h-full rounded-none border-0 border-b-2 border-transparent data-[state=active]:shadow-none">
+                            {t('settings.income')} ({incomeCategories.length})
                         </TabsTrigger>
                     </TabsList>
 
@@ -311,9 +396,14 @@ export function Settings() {
                         </div>
                         {expenseCategories.length === 0 && (
                             <div className="text-center py-8">
-                                <p className="text-muted-foreground">No expense categories</p>
-                                <Button onClick={handleAddCategory} className="mt-4" size="sm">
-                                    Add your first expense category
+                                <p className="text-muted-foreground">
+                                    {t('settings.noExpenseCategories')}
+                                </p>
+                                <Button
+                                    onClick={handleAddCategory}
+                                    className="mt-4"
+                                    size="sm">
+                                    {t('settings.addFirstExpense')}
                                 </Button>
                             </div>
                         )}
@@ -333,9 +423,14 @@ export function Settings() {
                         </div>
                         {incomeCategories.length === 0 && (
                             <div className="text-center py-8">
-                                <p className="text-muted-foreground">No income categories</p>
-                                <Button onClick={handleAddCategory} className="mt-4" size="sm">
-                                    Add your first income category
+                                <p className="text-muted-foreground">
+                                    {t('settings.noIncomeCategories')}
+                                </p>
+                                <Button
+                                    onClick={handleAddCategory}
+                                    className="mt-4"
+                                    size="sm">
+                                    {t('settings.addFirstIncome')}
                                 </Button>
                             </div>
                         )}
@@ -345,40 +440,43 @@ export function Settings() {
 
             <div className="card p-2 md-p4 ">
                 <h2 className="text-xl font-bold text-foreground pb-3 pt-5">
-                    Data Management
+                    {t('settings.dataManagement')}
                 </h2>
                 <div className="flex items-center gap-4 md:px-4  min-h-[72px] py-2 justify-between">
                     <div className="flex flex-col justify-center">
                         <p className="text-foreground text-base font-medium leading-normal line-clamp-1">
-                            Export Data
+                            {t('settings.exportData')}
                         </p>
                         <p className="text-muted-foreground text-sm font-normal leading-normal line-clamp-2">
-                            Export all your expense data to a CSV file.
+                            {t('settings.exportDescription')}
                         </p>
                     </div>
                     <div className="shrink-0">
                         <Button
                             onClick={handleExportData}
                             className="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-8 px-4 bg-primary text-primary-foreground text-sm font-medium leading-normal w-fit">
-                            <span className="truncate">Export</span>
+                            <span className="truncate">
+                                {t('common.export')}
+                            </span>
                         </Button>
                     </div>
                 </div>
                 <div className="flex items-center gap-4 md:px-4  min-h-[72px] py-2 justify-between">
                     <div className="flex flex-col justify-center">
                         <p className="text-foreground text-base font-medium leading-normal line-clamp-1">
-                            Delete All Data
+                            {t('settings.deleteAllData')}
                         </p>
                         <p className="text-muted-foreground text-sm font-normal leading-normal line-clamp-2">
-                            Permanently delete all your expense data. This
-                            action cannot be undone.
+                            {t('settings.deleteAllDescription')}
                         </p>
                     </div>
                     <div className="shrink-0">
                         <Button
                             onClick={handleClearData}
                             className="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-8 px-4 bg-primary text-primary-foreground text-sm font-medium leading-normal w-fit">
-                            <span className="truncate">Delete</span>
+                            <span className="truncate">
+                                {t('common.delete')}
+                            </span>
                         </Button>
                     </div>
                 </div>
@@ -389,12 +487,14 @@ export function Settings() {
                 <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
                     <DialogHeader>
                         <DialogTitle>
-                            {editingCategory ? 'Edit Category' : 'Add Category'}
+                            {editingCategory
+                                ? t('settings.editCategory')
+                                : t('settings.addCategory')}
                         </DialogTitle>
                         <DialogDescription>
                             {editingCategory
-                                ? 'Update the category name, icon, color, and type.'
-                                : 'Create a new category by selecting an icon, color, and type.'}
+                                ? t('settings.editCategoryDescription')
+                                : t('settings.addCategoryDescription')}
                         </DialogDescription>
                     </DialogHeader>
                     <CategoryForm

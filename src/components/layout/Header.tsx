@@ -1,16 +1,18 @@
 import { useState } from 'react'
 import { Link, useLocation } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 
 export function Header() {
     const [isOpen, setIsOpen] = useState(false)
     const location = useLocation()
+    const { t } = useTranslation()
 
     const navLinks = [
-        { path: '/overview', label: 'Overview' },
-        { path: '/transactions', label: 'Transactions' },
-        { path: '/analytics', label: 'Analytics' },
-        { path: '/settings', label: 'Settings' },
-        { path: '/add-transaction', label: 'Add Transaction' },
+        { path: '/overview', label: t('nav.overview') },
+        { path: '/transactions', label: t('nav.transactions') },
+        { path: '/analytics', label: t('nav.analytics') },
+        { path: '/settings', label: t('nav.settings') },
+        { path: '/add-transaction', label: t('nav.addTransaction') },
     ]
 
     const isActive = (path: string) => location.pathname === path
@@ -18,7 +20,7 @@ export function Header() {
     return (
         <header className="md:flex md:justify-between md:items-end border-b">
             <div className="p-4 flex justify-between items-center">
-                <h2 className="text-lg font-bold">Expense Tracker</h2>
+                <h2 className="text-lg font-bold">{t('common.appName')}</h2>
 
                 {/* Mobile menu button */}
                 <button

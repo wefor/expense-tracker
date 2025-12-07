@@ -1,25 +1,27 @@
+import { useTranslation } from 'react-i18next'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { StatTabContent } from '@/components/features/StatTabContent'
 
 export function Analytics() {
+    const { t } = useTranslation()
     const tabs = [
         {
-            name: 'This Month',
+            name: t('analytics.thisMonth'),
             value: 'this-month',
             content: <StatTabContent range="month" />,
         },
         {
-            name: 'Last Month',
+            name: t('analytics.lastMonth'),
             value: 'last-month',
             content: <StatTabContent range="last-month" />,
         },
         {
-            name: 'This Year',
+            name: t('analytics.thisYear'),
             value: 'this-year',
             content: <StatTabContent range="year" />,
         },
         {
-            name: 'Last Year',
+            name: t('analytics.lastYear'),
             value: 'last-year',
             content: <StatTabContent range="last-year" />,
         },
@@ -28,10 +30,7 @@ export function Analytics() {
     return (
         <div className="p-4">
             <div className="py-5">
-                <h1 className="text-3xl font-bold mb-4">Financial Analytics</h1>
-                <p className="text-muted-foreground">
-                    Analyze your financial performance over different periods.
-                </p>
+                <h1 className="text-3xl font-bold mb-4">{t('analytics.title')}</h1>
             </div>
             <div className="pb-3">
                 <Tabs defaultValue="this-month" className="gap-6 w-full">

@@ -1,20 +1,30 @@
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
+import { useTranslation } from 'react-i18next'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 import type { Category } from '@/types/category'
 
-const categorySchema = z.object({
-    name: z.string().min(1, 'Category name is required').max(50, 'Category name cannot exceed 50 characters'),
-    type: z.enum(['income', 'expense']),
-    icon: z.string().min(1, 'Please select an icon'),
-    color: z.string().regex(/^#[0-9A-F]{6}$/i, 'Please select a valid color'),
-})
+const createCategorySchema = (t: (key: string) => string) =>
+    z.object({
+        name: z
+            .string()
+            .min(1, t('categoryForm.categoryNameRequired'))
+            .max(50, t('categoryForm.categoryNameMaxLength')),
+        type: z.enum(['income', 'expense']),
+        icon: z.string().min(1, t('categoryForm.selectIconRequired')),
+        color: z.string().regex(/^#[0-9A-F]{6}$/i, t('categoryForm.selectColorRequired')),
+    })
 
-type CategoryFormData = z.infer<typeof categorySchema>
+type CategoryFormData = {
+    name: string
+    type: 'income' | 'expense'
+    icon: string
+    color: string
+}
 
 interface CategoryFormProps {
     initialData?: Category
@@ -35,6 +45,7 @@ const COMMON_COLORS = [
 ]
 
 export function CategoryForm({ initialData, onSubmit, onCancel }: CategoryFormProps) {
+    const { t } = useTranslation()
     const {
         register,
         handleSubmit,
@@ -42,7 +53,7 @@ export function CategoryForm({ initialData, onSubmit, onCancel }: CategoryFormPr
         setValue,
         formState: { errors },
     } = useForm<CategoryFormData>({
-        resolver: zodResolver(categorySchema),
+        resolver: zodResolver(createCategorySchema(t)),
         defaultValues: initialData || {
             name: '',
             type: 'expense',
@@ -62,11 +73,11 @@ export function CategoryForm({ initialData, onSubmit, onCancel }: CategoryFormPr
         <form onSubmit={handleSubmit(handleFormSubmit)} className="space-y-6">
             {/* Category Name */}
             <div className="space-y-2">
-                <Label htmlFor="name">Category Name</Label>
+                <Label htmlFor="name">{t('categoryForm.categoryName')}</Label>
                 <Input
                     id="name"
                     {...register('name')}
-                    placeholder="Enter category name"
+                    placeholder={t('categoryForm.categoryNamePlaceholder')}
                 />
                 {errors.name && (
                     <p className="text-sm text-destructive">{errors.name.message}</p>
@@ -75,18 +86,18 @@ export function CategoryForm({ initialData, onSubmit, onCancel }: CategoryFormPr
 
             {/* Category Type */}
             <div className="space-y-2">
-                <Label>Category Type</Label>
+                <Label>{t('categoryForm.categoryType')}</Label>
                 <RadioGroup
                     value={watch('type')}
                     onValueChange={(value) => setValue('type', value as 'income' | 'expense')}
                 >
                     <div className="flex items-center space-x-2">
                         <RadioGroupItem value="expense" id="expense" />
-                        <Label htmlFor="expense" className="cursor-pointer">Expense</Label>
+                        <Label htmlFor="expense" className="cursor-pointer">{t('settings.expense')}</Label>
                     </div>
                     <div className="flex items-center space-x-2">
                         <RadioGroupItem value="income" id="income" />
-                        <Label htmlFor="income" className="cursor-pointer">Income</Label>
+                        <Label htmlFor="income" className="cursor-pointer">{t('settings.income')}</Label>
                     </div>
                 </RadioGroup>
                 {errors.type && (
@@ -96,7 +107,7 @@ export function CategoryForm({ initialData, onSubmit, onCancel }: CategoryFormPr
 
             {/* Icon Selection */}
             <div className="space-y-2">
-                <Label>Icon</Label>
+                <Label>{t('categoryForm.selectIcon')}</Label>
                 <div className="grid grid-cols-10 gap-2">
                     {COMMON_ICONS.map((icon) => (
                         <button
@@ -120,7 +131,7 @@ export function CategoryForm({ initialData, onSubmit, onCancel }: CategoryFormPr
 
             {/* Color Selection */}
             <div className="space-y-2">
-                <Label>Color</Label>
+                <Label>{t('categoryForm.selectColor')}</Label>
                 <div className="grid grid-cols-9 gap-2">
                     {COMMON_COLORS.map((color) => (
                         <button
@@ -141,7 +152,7 @@ export function CategoryForm({ initialData, onSubmit, onCancel }: CategoryFormPr
                         {...register('color')}
                         className="w-20 h-10"
                     />
-                    <span className="text-sm text-muted-foreground">Or enter custom color</span>
+                    <span className="text-sm text-muted-foreground">{t('categoryForm.customColor')}</span>
                 </div>
                 {errors.color && (
                     <p className="text-sm text-destructive">{errors.color.message}</p>
@@ -150,14 +161,14 @@ export function CategoryForm({ initialData, onSubmit, onCancel }: CategoryFormPr
 
             {/* Preview */}
             <div className="space-y-2">
-                <Label>Preview</Label>
+                <Label>{t('categoryForm.preview')}</Label>
                 <div
                     className="flex items-center gap-3 p-4 rounded-lg"
                     style={{ backgroundColor: selectedColor + '20' }}
                 >
                     <span className="text-3xl">{selectedIcon}</span>
                     <span className="text-lg font-medium" style={{ color: selectedColor }}>
-                        {watch('name') || 'Category Name'}
+                        {watch('name') || t('categoryForm.previewPlaceholder')}
                     </span>
                 </div>
             </div>
@@ -165,10 +176,10 @@ export function CategoryForm({ initialData, onSubmit, onCancel }: CategoryFormPr
             {/* Buttons */}
             <div className="flex justify-end gap-3">
                 <Button type="button" variant="outline" onClick={onCancel}>
-                    Cancel
+                    {t('common.cancel')}
                 </Button>
                 <Button type="submit">
-                    {initialData ? 'Update' : 'Add'}
+                    {initialData ? t('common.update') : t('common.add')}
                 </Button>
             </div>
         </form>

@@ -1,4 +1,5 @@
 import { useState, useContext } from 'react'
+import { useTranslation } from 'react-i18next'
 import type { Category } from '@/types/category'
 import { TransactionContext } from '@/context/TransactionContext'
 import { CategoriesContext } from '@/context/CategoriesContext'
@@ -29,6 +30,7 @@ import { formatDateDisplay, formatDateISO } from '@/utils/formatDate'
 import { clsx } from 'clsx'
 
 export function Filters() {
+    const { t } = useTranslation()
     const transactionContext = useContext(TransactionContext)
     const categoriesContext = useContext(CategoriesContext)
 
@@ -115,7 +117,7 @@ export function Filters() {
                         </InputGroupText>
                     </InputGroupAddon>
                     <InputGroupInput
-                        placeholder="Search by description..."
+                        placeholder={t('filters.searchPlaceholder')}
                         value={filters.searchTerm}
                         id="form-amount"
                         onChange={(e) =>
@@ -136,7 +138,7 @@ export function Filters() {
                 </InputGroup>
 
                 <Button variant="secondary" onClick={() => setIsOpen(!isOpen)}>
-                    Filters {isOpen ? <ChevronUpIcon /> : <ChevronDownIcon />}
+                    {t('filters.title')} {isOpen ? <ChevronUpIcon /> : <ChevronDownIcon />}
                 </Button>
                 <Button
                     size="icon"
@@ -147,11 +149,11 @@ export function Filters() {
             <Card className={clsx(isOpen ? 'block' : 'hidden')}>
                 <CardHeader>
                     <CardTitle className="text-2xl text-bold">
-                        Filters
+                        {t('filters.title')}
                     </CardTitle>
                 </CardHeader>
                 <CardContent>
-                    <Label>Type</Label>
+                    <Label>{t('filters.type')}</Label>
                     <div className="flex flex-wrap gap-4 p-4">
                         <RadioGroup
                             defaultValue="all"
@@ -160,25 +162,25 @@ export function Filters() {
                             className="flex items-center flex-wrap gap-4">
                             <div className="flex items-center gap-2">
                                 <RadioGroupItem value="all" id="rdo-all" />
-                                <Label htmlFor="rdo-all">All</Label>
+                                <Label htmlFor="rdo-all">{t('filters.all')}</Label>
                             </div>
                             <div className="flex items-center gap-2">
                                 <RadioGroupItem
                                     value="expense"
                                     id="rdo-expense"
                                 />
-                                <Label htmlFor="rdo-expense">Expense</Label>
+                                <Label htmlFor="rdo-expense">{t('settings.expense')}</Label>
                             </div>
                             <div className="flex items-center gap-2">
                                 <RadioGroupItem
                                     value="income"
                                     id="rdo-income"
                                 />
-                                <Label htmlFor="rdo-income">Income</Label>
+                                <Label htmlFor="rdo-income">{t('settings.income')}</Label>
                             </div>
                         </RadioGroup>
                     </div>
-                    <Label className="mt-3">Categories</Label>
+                    <Label className="mt-3">{t('filters.categories')}</Label>
                     <div className="flex flex-wrap gap-4 p-4">
                         {categoryList.map((category) => (
                             <div
@@ -199,7 +201,7 @@ export function Filters() {
                         ))}
                     </div>
                     <Label className="my-3">
-                        Date Range{' '}
+                        {t('filters.dateRange')}{' '}
                         {byDateRange && (
                             <span className="text-muted-foreground">
                                 {byDateRange.from &&
@@ -219,7 +221,7 @@ export function Filters() {
                         className="rounded-lg border shadow-sm"
                     />
                     <Label className="my-6">
-                        Amount Range{' '}
+                        {t('filters.amountRange')}{' '}
                         {byAmount[1] > 0 && (
                             <span className="text-muted-foreground">
                                 {byAmount[0]} ~ {byAmount[1]}
@@ -237,9 +239,9 @@ export function Filters() {
                 </CardContent>
                 <CardFooter className="gap-3 max-sm:flex-col max-sm:items-stretch mt-3">
                     <Button variant="outline" onClick={handleReset}>
-                        Reset Filters
+                        {t('filters.reset')}
                     </Button>
-                    <Button onClick={handleApply}>Apply Filters</Button>
+                    <Button onClick={handleApply}>{t('filters.apply')}</Button>
                 </CardFooter>
             </Card>
         </div>

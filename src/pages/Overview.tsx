@@ -1,5 +1,6 @@
 import { useContext, useMemo } from 'react'
 import { Link } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import { TransactionContext } from '@/context/TransactionContext'
 import { CategoriesContext } from '@/context/CategoriesContext'
 import { StatCard } from '@/components/features/StatCard'
@@ -10,6 +11,7 @@ import { calculateStatistics } from '@/utils/calculateStats'
 import { getMonthRange, formatMonth } from '@/utils/formatDate'
 
 export function Overview() {
+    const { t } = useTranslation()
     const transactionContext = useContext(TransactionContext)
     const categoriesContext = useContext(CategoriesContext)
 
@@ -70,31 +72,28 @@ export function Overview() {
         <div className="p-4">
             <div>
                 <h1 className="text-3xl font-bold mb-4">
-                    Financial Overview
+                    {t('overview.title')}
                     <span className="mx-3 text-lg">{monthStr}</span>
                 </h1>
-                <p className="text-muted-foreground">
-                    View your spending statistics and recent transactions
-                </p>
             </div>
             <div className="py-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                 <StatCard
-                    label="This Month Expense"
+                    label={t('overview.thisMonthExpense')}
                     value={formatCurrency(stats.totalExpense)}
                     compare={stats.expenseCompare}
                 />
                 <StatCard
-                    label="This Month Income"
+                    label={t('overview.thisMonthIncome')}
                     value={formatCurrency(stats.totalIncome)}
                     compare={stats.incomeCompare}
                 />
                 <StatCard
-                    label="Current Balance"
+                    label={t('overview.currentBalance')}
                     value={formatCurrency(stats.netAmount)}
                     compare={stats.netAmountCompare}
                 />
                 <StatCard
-                    label="Today's Spending"
+                    label={t('overview.todaysSpending')}
                     value={formatCurrency(stats.todayExpense)}
                     compare={stats.todayExpenseCompare}
                 />
@@ -103,7 +102,7 @@ export function Overview() {
             {/* Top Categories */}
             <div className="mt-5 p-2">
                 <h2 className="text-xl font-bold mb-4">
-                    Top 5 expenditure categories
+                    {t('analytics.topCategories')}
                 </h2>
                 {stats.categoryStats.length > 0 ? (
                     <div className="space-y-3">
@@ -116,7 +115,7 @@ export function Overview() {
                     </div>
                 ) : (
                     <p className="text-gray-500">
-                        No classification data available.
+                        {t('analytics.noData')}
                     </p>
                 )}
             </div>
@@ -124,11 +123,11 @@ export function Overview() {
             {/* Recent Transactions */}
             <div className="mt-5 p-2">
                 <div className="flex items-center justify-between mb-4">
-                    <h2 className="text-xl font-bold">Recent Transactions</h2>
+                    <h2 className="text-xl font-bold">{t('overview.recentTransactions')}</h2>
                     <Link
                         to="/transactions"
                         className="text-sm underline text-muted-foreground">
-                        View All
+                        {t('overview.viewAll')}
                     </Link>
                 </div>
                 <div className="space-y-1">
@@ -141,7 +140,7 @@ export function Overview() {
                 </div>
                 {recentTransactions.length === 0 && (
                     <p className="text-gray-500 text-left py-8">
-                        No transaction records yet
+                        {t('overview.noTransactions')}
                     </p>
                 )}
             </div>

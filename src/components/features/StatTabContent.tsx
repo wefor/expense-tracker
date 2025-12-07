@@ -1,10 +1,10 @@
-import { useMemo } from 'react'
+import { useMemo, useContext } from 'react'
+import { useTranslation } from 'react-i18next'
 import { StatCard } from '@/components/features/StatCard'
 import { formatCurrency } from '@/utils/formatCurrency'
 import { calculateStatistics } from '@/utils/calculateStats'
 import { TransactionContext } from '@/context/TransactionContext'
 import { CategoriesContext } from '@/context/CategoriesContext'
-import { useContext } from 'react'
 import { getMonthRange, getYearRange } from '@/utils/formatDate'
 import { StatChart } from '@/components/features/StatChart'
 import { CategoryChart } from '@/components/features/CategoryChart'
@@ -23,6 +23,7 @@ interface StatTabContentProps {
 }
 
 export function StatTabContent({ range }: StatTabContentProps) {
+    const { t } = useTranslation()
     const transactionContext = useContext(TransactionContext)
     const categoriesContext = useContext(CategoriesContext)
 
@@ -100,47 +101,47 @@ export function StatTabContent({ range }: StatTabContentProps) {
         <>
             <div className="py-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 <StatCard
-                    label="Total Income"
+                    label={t('analytics.totalIncome')}
                     value={formatCurrency(stats.totalIncome)}
                     compare={stats.incomeCompare}
                 />
                 <StatCard
-                    label="Total Expense"
+                    label={t('analytics.totalExpense')}
                     value={formatCurrency(stats.totalExpense)}
                     compare={stats.expenseCompare}
                 />
                 <StatCard
-                    label="Net Amount"
+                    label={t('analytics.netAmount')}
                     value={formatCurrency(stats.netAmount)}
                     compare={stats.netAmountCompare}
                 />
             </div>
             <div className="pb-3 pt-5">
-                <h2 className="text-xl font-bold mb-4">Expenses Overview</h2>
+                <h2 className="text-xl font-bold mb-4">{t('analytics.expensesOverview')}</h2>
                 <div className="flex flex-wrap gap-4 px-0 py-6">
                     <StatChart
-                        title="Monthly Spending Trend"
+                        title={t('analytics.monthlySpendingTrend')}
                         value={formatCurrency(stats.totalExpense)}
                         compare={stats.expenseCompare}
                         data={spendingTrendData}
                     />
                     <CategoryChart
-                        title="Expenses by Category"
+                        title={t('analytics.expensesByCategory')}
                         data={stats.categoryStats}
                     />
                 </div>
             </div>
             <div className="pb-3 pt-5">
-                <h2 className="text-xl font-bold mb-4">Category Details</h2>
+                <h2 className="text-xl font-bold mb-4">{t('analytics.categoryDetails')}</h2>
                 <div className="overflow-hidden rounded-md border">
                     <Table>
                         <TableHeader>
                             <TableRow>
-                                <TableHead>Category</TableHead>
-                                <TableHead>Transactions</TableHead>
-                                <TableHead>Amount</TableHead>
+                                <TableHead>{t('analytics.category')}</TableHead>
+                                <TableHead>{t('analytics.transactions')}</TableHead>
+                                <TableHead>{t('analytics.amount')}</TableHead>
                                 <TableHead className="text-right">
-                                    % of Total
+                                    {t('analytics.percentOfTotal')}
                                 </TableHead>
                             </TableRow>
                         </TableHeader>
@@ -167,7 +168,7 @@ export function StatTabContent({ range }: StatTabContentProps) {
                                     <TableCell
                                         colSpan={4}
                                         className="text-center">
-                                        No data found
+                                        {t('analytics.noDataFound')}
                                     </TableCell>
                                 </TableRow>
                             )}
