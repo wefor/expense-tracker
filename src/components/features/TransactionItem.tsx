@@ -4,7 +4,6 @@ import { CategoriesContext } from '@/context/CategoriesContext'
 import { formatCurrency } from '@/utils/formatCurrency'
 import { Button } from '@/components/ui/button'
 import { Trash2, FileText } from 'lucide-react'
-import { formatDateDisplay } from '@/utils/formatDate'
 
 interface TransactionItemProps {
     transaction: Transaction

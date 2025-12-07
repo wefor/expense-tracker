@@ -1,4 +1,4 @@
-import { type ReactNode, useContext, useState, useEffect } from 'react'
+import { type ReactNode, useContext, useEffect } from 'react'
 import { Header } from './Header'
 import { SettingsContext } from '@/context/SettingsContext'
 import { Toaster } from '@/components/ui/sonner'
@@ -10,10 +10,8 @@ export function Layout({ children }: { children: ReactNode }) {
         throw new Error('SettingsContext not found')
     }
     const { settings } = settingsContext
-    const [theme, setTheme] = useState(settings.theme)
 
     useEffect(() => {
-        setTheme(settings.theme)
         document.documentElement.setAttribute('class', settings.theme)
     }, [settings.theme])
     return (
