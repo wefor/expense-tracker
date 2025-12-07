@@ -1,9 +1,10 @@
 /* eslint-disable react-refresh/only-export-components */
 import type { Category } from '@/types/category'
-import { createContext, useCallback, type ReactNode } from 'react'
+import { createContext, useCallback, useMemo, type ReactNode } from 'react'
+import { useTranslation } from 'react-i18next'
 import { useCategories } from '@/hooks/useCategories'
 import { useLocalStorage } from '@/hooks/useLocalStorage'
-import { DEFAULT_CATEGORIES } from '@/data/defaultCategories'
+import { CATEGORY_TEMPLATES, createCategoryFromTemplate } from '@/data/defaultCategories'
 import { generateId } from '@/utils/validation'
 
 export interface CategoriesContextValue {
@@ -26,12 +27,27 @@ interface CategoriesProviderProps {
     children: ReactNode
 }
 
-const STORAGE_KEY = 'expense-tracker-categories'
+const CUSTOM_CATEGORIES_KEY = 'expense-tracker-custom-categories'
 
 export function CategoriesProvider({ children }: CategoriesProviderProps) {
-    const [categories, setCategories] = useLocalStorage<Category[]>(
-        STORAGE_KEY,
-        DEFAULT_CATEGORIES
+    const { t } = useTranslation()
+
+    // Store only custom categories (non-default ones)
+    const [customCategories, setCustomCategories] = useLocalStorage<Category[]>(
+        CUSTOM_CATEGORIES_KEY,
+        []
+    )
+
+    // Generate default categories with current language
+    const defaultCategories = useMemo(
+        () => CATEGORY_TEMPLATES.map(template => createCategoryFromTemplate(template, t)),
+        [t]
+    )
+
+    // Combine default and custom categories
+    const categories = useMemo(
+        () => [...defaultCategories, ...customCategories],
+        [defaultCategories, customCategories]
     )
 
     const categoryHooks = useCategories(categories)
@@ -42,30 +58,44 @@ export function CategoriesProvider({ children }: CategoriesProviderProps) {
                 ...category,
                 id: generateId(),
             }
-            setCategories((prev) => [...prev, newCategory])
+            setCustomCategories((prev) => [...prev, newCategory])
         },
-        [setCategories]
+        [setCustomCategories]
     )
 
     const updateCategory = useCallback(
         (id: string, updates: Partial<Category>) => {
-            setCategories((prev) =>
+            // Check if it's a default category (cannot be updated)
+            const isDefaultCategory = CATEGORY_TEMPLATES.some(template => template.id === id)
+            if (isDefaultCategory) {
+                console.warn('Cannot update default category')
+                return
+            }
+
+            setCustomCategories((prev) =>
                 prev.map((cat) => (cat.id === id ? { ...cat, ...updates } : cat))
             )
         },
-        [setCategories]
+        [setCustomCategories]
     )
 
     const deleteCategory = useCallback(
         (id: string) => {
-            setCategories((prev) => prev.filter((cat) => cat.id !== id))
+            // Check if it's a default category (cannot be deleted)
+            const isDefaultCategory = CATEGORY_TEMPLATES.some(template => template.id === id)
+            if (isDefaultCategory) {
+                console.warn('Cannot delete default category')
+                return
+            }
+
+            setCustomCategories((prev) => prev.filter((cat) => cat.id !== id))
         },
-        [setCategories]
+        [setCustomCategories]
     )
 
     const resetToDefault = useCallback(() => {
-        setCategories(DEFAULT_CATEGORIES)
-    }, [setCategories])
+        setCustomCategories([])
+    }, [setCustomCategories])
 
     const value: CategoriesContextValue = {
         categories,

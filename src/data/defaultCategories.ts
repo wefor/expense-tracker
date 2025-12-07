@@ -1,73 +1,82 @@
 import type { Category } from '@/types/category'
 
-export const DEFAULT_CATEGORIES: Category[] = [
+// Category template with translation key
+export interface CategoryTemplate {
+    id: string
+    nameKey: string
+    icon: string
+    color: string
+    type: 'income' | 'expense'
+}
+
+export const CATEGORY_TEMPLATES: CategoryTemplate[] = [
     // Expense categories
     {
         id: 'food',
-        name: 'Food',
+        nameKey: 'categories.food',
         icon: '🍔',
         color: '#F97316',
         type: 'expense',
     },
     {
         id: 'transport',
-        name: 'Transport',
+        nameKey: 'categories.transport',
         icon: '🚌',
         color: '#3B82F6',
         type: 'expense',
     },
     {
         id: 'housing',
-        name: 'Housing',
+        nameKey: 'categories.housing',
         icon: '🏠',
         color: '#8B5CF6',
         type: 'expense',
     },
     {
         id: 'shopping',
-        name: 'Shopping',
+        nameKey: 'categories.shopping',
         icon: '🛍️',
         color: '#EC4899',
         type: 'expense',
     },
     {
         id: 'entertainment',
-        name: 'Entertainment',
+        nameKey: 'categories.entertainment',
         icon: '🎮',
         color: '#EF4444',
         type: 'expense',
     },
     {
         id: 'health',
-        name: 'Health',
+        nameKey: 'categories.health',
         icon: '💊',
         color: '#10B981',
         type: 'expense',
     },
     {
         id: 'education',
-        name: 'Education',
+        nameKey: 'categories.education',
         icon: '📚',
         color: '#6366F1',
         type: 'expense',
     },
     {
         id: 'work',
-        name: 'Work',
+        nameKey: 'categories.work',
         icon: '💼',
         color: '#FBBF24',
         type: 'expense',
     },
     {
         id: 'travel',
-        name: 'Travel',
+        nameKey: 'categories.travel',
         icon: '✈️',
         color: '#06B6D4',
         type: 'expense',
     },
     {
         id: 'other-expense',
-        name: 'Other Expense',
+        nameKey: 'categories.otherExpense',
         icon: '🏦',
         color: '#6B7280',
         type: 'expense',
@@ -76,37 +85,60 @@ export const DEFAULT_CATEGORIES: Category[] = [
     // Income categories
     {
         id: 'salary',
-        name: 'Salary',
+        nameKey: 'categories.salary',
         icon: '💰',
         color: '#10B981',
         type: 'income',
     },
     {
         id: 'gift',
-        name: 'Gift',
+        nameKey: 'categories.gift',
         icon: '🎁',
         color: '#F59E0B',
         type: 'income',
     },
     {
         id: 'investment',
-        name: 'Investment',
+        nameKey: 'categories.investment',
         icon: '📈',
         color: '#3B82F6',
         type: 'income',
     },
     {
         id: 'side-income',
-        name: 'Side Income',
+        nameKey: 'categories.sideIncome',
         icon: '🤝',
         color: '#8B5CF6',
         type: 'income',
     },
     {
         id: 'other-income',
-        name: 'Other Income',
+        nameKey: 'categories.otherIncome',
         icon: '✨',
         color: '#6B7280',
         type: 'income',
     },
 ]
+
+// Helper function to convert template to Category with translated name
+export function createCategoryFromTemplate(
+    template: CategoryTemplate,
+    translateFn: (key: string) => string
+): Category {
+    return {
+        id: template.id,
+        name: translateFn(template.nameKey),
+        icon: template.icon,
+        color: template.color,
+        type: template.type,
+    }
+}
+
+// Legacy export for backward compatibility (uses English as default)
+export const DEFAULT_CATEGORIES: Category[] = CATEGORY_TEMPLATES.map((template) => ({
+    id: template.id,
+    name: template.nameKey.split('.').pop() || template.id,
+    icon: template.icon,
+    color: template.color,
+    type: template.type,
+}))
