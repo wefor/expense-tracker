@@ -140,7 +140,7 @@ export function Transactions() {
 
             {/* Edit Modal */}
             <Dialog open={!!editingId} onOpenChange={() => setEditingId(null)}>
-                <DialogContent>
+                <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
                     <DialogHeader>
                         <DialogTitle>Edit transaction</DialogTitle>
                         <DialogDescription></DialogDescription>
