@@ -44,7 +44,7 @@ export function Transactions() {
     const filteredTransactions = useMemo(() => {
         if (!filters) return transactions
         return getTransactions(filters)
-    }, [transactions, filters])
+    }, [transactions, filters, getTransactions])
 
     // Sort by date (newest first)
     const sortedTransactions = useMemo(

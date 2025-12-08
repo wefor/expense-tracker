@@ -22,12 +22,17 @@ export function Overview() {
     const { transactions } = transactionContext
     const { categories } = categoriesContext
 
-    const today = new Date()
+    // Memoize date calculations to ensure stable references
+    const today = useMemo(() => new Date(), [])
+    const lastMonth = useMemo(
+        () => new Date(today.getFullYear(), today.getMonth() - 1, 1),
+        [today]
+    )
+
     // Get current month range
-    const monthRange = useMemo(() => getMonthRange(today), [])
+    const monthRange = useMemo(() => getMonthRange(today), [today])
     // Get last month range
-    const lastMonth = new Date(today.getFullYear(), today.getMonth() - 1, 1)
-    const lastMonthRange = useMemo(() => getMonthRange(lastMonth), [])
+    const lastMonthRange = useMemo(() => getMonthRange(lastMonth), [lastMonth])
 
     // Get current month stats
     const monthTransactions = useMemo(
