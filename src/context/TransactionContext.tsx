@@ -1,5 +1,5 @@
 /* eslint-disable react-refresh/only-export-components */
-import { createContext, type ReactNode, useReducer, useCallback } from 'react'
+import { createContext, type ReactNode, useReducer, useCallback, useEffect } from 'react'
 import type { Transaction, FilterOptions } from '@/types/transaction'
 import { useTransactions } from '../hooks/useTransactions'
 import { useLocalStorage } from '../hooks/useLocalStorage'
@@ -123,6 +123,11 @@ export function TransactionProvider({ children }: TransactionProviderProps) {
 
     const transactionHooks = useTransactions(state.transactions)
 
+    // Sync reducer state to localStorage whenever transactions change
+    useEffect(() => {
+        setStoredTransactions(state.transactions)
+    }, [state.transactions, setStoredTransactions])
+
     const addTransaction = useCallback(
         (transaction: Omit<Transaction, 'id' | 'createdAt' | 'updatedAt'>) => {
             const uuid = generateId()
@@ -130,43 +135,25 @@ export function TransactionProvider({ children }: TransactionProviderProps) {
                 type: 'ADD_TRANSACTION',
                 payload: { ...transaction, id: uuid },
             })
-            // Re-save to localStorage
-            setStoredTransactions((prev) => {
-                const newTransaction: Transaction = {
-                    ...transaction,
-                    id: uuid,
-                    createdAt: Date.now(),
-                    updatedAt: Date.now(),
-                }
-                return [newTransaction, ...prev]
-            })
         },
-        [setStoredTransactions]
+        []
     )
 
     const updateTransaction = useCallback(
         (id: string, updates: Partial<Transaction>) => {
-            if (state.transactions.find((t) => t.id === id)) {
+            const existingTransaction = state.transactions.find((t) => t.id === id)
+            if (existingTransaction) {
                 dispatch({
                     type: 'UPDATE_TRANSACTION',
                     payload: {
-                        ...state.transactions.find((t) => t.id === id),
+                        ...existingTransaction,
                         ...updates,
                         id,
-                        updatedAt: Date.now(),
                     } as Transaction,
                 })
-                // Re-save to localStorage
-                setStoredTransactions((prev) =>
-                    prev.map((t) =>
-                        t.id === id
-                            ? { ...t, ...updates, updatedAt: Date.now() }
-                            : t
-                    )
-                )
             }
         },
-        [state.transactions, setStoredTransactions]
+        [state.transactions]
     )
 
     const deleteTransaction = useCallback(
@@ -175,19 +162,15 @@ export function TransactionProvider({ children }: TransactionProviderProps) {
                 type: 'DELETE_TRANSACTION',
                 payload: id,
             })
-            // Re-save to localStorage
-            setStoredTransactions((prev) => prev.filter((t) => t.id !== id))
         },
-        [setStoredTransactions]
+        []
     )
 
     const deleteAllTransactions = useCallback(() => {
         dispatch({
             type: 'DELETE_ALL_TRANSACTIONS',
         })
-        // Re-save to localStorage
-        setStoredTransactions([])
-    }, [setStoredTransactions])
+    }, [])
 
     const setFilters = useCallback(
         (updates: Partial<FilterOptions>) => {

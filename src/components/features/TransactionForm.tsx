@@ -1,4 +1,4 @@
-import { useState, useContext, useEffect } from 'react'
+import { useState, useContext, useEffect, useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 import { CategoriesContext } from '@/context/CategoriesContext'
 import { TransactionContext } from '@/context/TransactionContext'
@@ -101,25 +101,41 @@ export function TransactionForm({
         { label: t('addTransaction.expense'), value: 'expense' },
         { label: t('addTransaction.income'), value: 'income' },
     ]
-    const expenseCategories = categoriesContext
-        .getCategoriesByType('expense')
-        .map((cat) => ({ value: cat.id, label: `${cat.icon} ${cat.name}` }))
-    const incomeCategories = categoriesContext
-        .getCategoriesByType('income')
-        .map((cat) => ({
-            value: cat.id,
-            label: `${cat.icon} ${cat.name}`,
-        }))
 
-    const [categoriesOptions, setCategoryOptions] = useState(expenseCategories)
+    // Memoize category options to prevent unnecessary recalculations
+    const expenseCategories = useMemo(
+        () => categoriesContext
+            .getCategoriesByType('expense')
+            .map((cat) => ({ value: cat.id, label: `${cat.icon} ${cat.name}` })),
+        [categoriesContext]
+    )
 
+    const incomeCategories = useMemo(
+        () => categoriesContext
+            .getCategoriesByType('income')
+            .map((cat) => ({ value: cat.id, label: `${cat.icon} ${cat.name}` })),
+        [categoriesContext]
+    )
+
+    const currentType = form.watch('type')
+
+    // Dynamically determine category options based on selected type
+    const categoriesOptions = useMemo(
+        () => currentType === 'income' ? incomeCategories : expenseCategories,
+        [currentType, incomeCategories, expenseCategories]
+    )
+
+    // Initialize category options based on initialData
     useEffect(() => {
-        if (initialData) {
-            if (initialData.type === 'income')
-                setCategoryOptions(incomeCategories)
-            else setCategoryOptions(expenseCategories)
+        if (initialData?.type && !initialData?.category) {
+            const initialCategories = initialData.type === 'income'
+                ? incomeCategories
+                : expenseCategories
+            if (initialCategories.length > 0) {
+                form.setValue('category', initialCategories[0].value)
+            }
         }
-    }, [initialData])
+    }, [initialData?.type, initialData?.category, incomeCategories, expenseCategories, form])
 
     function handleSubmit(values: z.infer<typeof formSchema>) {
         const result: Omit<Transaction, 'id' | 'createdAt' | 'updatedAt'> = {
@@ -143,16 +159,7 @@ export function TransactionForm({
                                 <RadioGroup
                                     name={field.name}
                                     value={field.value}
-                                    onValueChange={(type) => {
-                                        if (type === 'income') {
-                                            setCategoryOptions(incomeCategories)
-                                        } else {
-                                            setCategoryOptions(
-                                                expenseCategories
-                                            )
-                                        }
-                                        field.onChange(type)
-                                    }}
+                                    onValueChange={field.onChange}
                                     defaultValue="expense"
                                     className="flex h-10 flex-1 items-center justify-around rounded-lg bg-secondary p-1">
                                     {typeOptions.map((type) => (

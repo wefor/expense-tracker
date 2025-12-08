@@ -2,6 +2,7 @@
 import type { Category } from '@/types/category'
 import { createContext, useCallback, useMemo, type ReactNode } from 'react'
 import { useTranslation } from 'react-i18next'
+import { toast } from 'sonner'
 import { useCategories } from '@/hooks/useCategories'
 import { useLocalStorage } from '@/hooks/useLocalStorage'
 import { CATEGORY_TEMPLATES, createCategoryFromTemplate } from '@/data/defaultCategories'
@@ -68,7 +69,7 @@ export function CategoriesProvider({ children }: CategoriesProviderProps) {
             // Check if it's a default category (cannot be updated)
             const isDefaultCategory = CATEGORY_TEMPLATES.some(template => template.id === id)
             if (isDefaultCategory) {
-                console.warn('Cannot update default category')
+                toast.error(t('settings.cannotUpdateDefaultCategory'))
                 return
             }
 
@@ -76,7 +77,7 @@ export function CategoriesProvider({ children }: CategoriesProviderProps) {
                 prev.map((cat) => (cat.id === id ? { ...cat, ...updates } : cat))
             )
         },
-        [setCustomCategories]
+        [setCustomCategories, t]
     )
 
     const deleteCategory = useCallback(
@@ -84,13 +85,13 @@ export function CategoriesProvider({ children }: CategoriesProviderProps) {
             // Check if it's a default category (cannot be deleted)
             const isDefaultCategory = CATEGORY_TEMPLATES.some(template => template.id === id)
             if (isDefaultCategory) {
-                console.warn('Cannot delete default category')
+                toast.error(t('settings.cannotDeleteDefaultCategory'))
                 return
             }
 
             setCustomCategories((prev) => prev.filter((cat) => cat.id !== id))
         },
-        [setCustomCategories]
+        [setCustomCategories, t]
     )
 
     const resetToDefault = useCallback(() => {
