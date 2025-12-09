@@ -4,6 +4,8 @@
 
 A lightweight personal budgeting application that helps users record daily income and expenses, track spending categories, and view financial reports. All data is stored locally in the browser, supporting various views and analytics features.
 
+[Demo](https://expense.cg01app.app/overview)
+
 ## Features
 
 ### Core Functionality
